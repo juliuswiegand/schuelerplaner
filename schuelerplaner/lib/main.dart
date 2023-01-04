@@ -8,6 +8,8 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:schuelerplaner/stundenplan.dart';
 import 'package:schuelerplaner/fachuebersicht.dart';
 
+// 04.01.2023
+
 Database? datenbank;
 
 void main() {
