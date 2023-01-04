@@ -142,7 +142,7 @@ class StundenDetails extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          stops: [0, 0.3, 1],
+          stops: [0, 0.4, 1],
           colors: [
             Color(int.parse(fach.farbe)),
             Theme.of(context).scaffoldBackgroundColor,
@@ -166,13 +166,13 @@ class StundenDetails extends StatelessWidget {
               children: [
                 Text(
                   fach.name,
-                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Colors.white,),
                 ),
                 Text(
                   'Lehrer: ' + fach.lehrer,
-                  style: TextStyle(fontSize: 20),
+                  style: TextStyle(fontSize: 20, color: Colors.white,),
                 ),
-                SizedBox(height: 100),
+                SizedBox(height: 150),
                 Text(
                   'Raum: ' + schulstunde.raum,
                   style: TextStyle(fontSize: 20),
@@ -380,7 +380,7 @@ class StundenplanKarte extends StatelessWidget {
             fach.name,
             style: TextStyle(
               fontSize: 18,
-              
+              color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
