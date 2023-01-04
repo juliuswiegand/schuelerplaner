@@ -219,11 +219,13 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
   bool ersteMalLaden = true;
   int ausgewaelterTagIndex = 0;
 
+  TextEditingController raumNameController = TextEditingController();
+
   // werter fuer neue stunde  
   Fach ausgewaehltesFach = Fach(lehrer: '', id: 0, name: '', farbe: '');
   TimeOfDay startzeit = TimeOfDay(hour: 0, minute: 0);
   TimeOfDay endzeit = TimeOfDay(hour: 0, minute: 0);
-  String raum = 'Egal';
+  String raum = '';
 
   @override
   void initState() {
@@ -240,7 +242,7 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
 
     Schulstunde schulstunde = Schulstunde(
       fachid: ausgewaehltesFach.id!, 
-      raum: raum, 
+      raum: raumNameController.value.text, 
       startzeit: konvertierteStartzeit, 
       endzeit: konvertierteEndzeit
     );
@@ -330,6 +332,7 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
               ),
 
               TextField(
+                controller: raumNameController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Raum',
