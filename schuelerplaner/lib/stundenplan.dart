@@ -94,8 +94,8 @@ class _StundenplanSeiteState extends State<StundenplanSeite> {
                     : stundenplan.isEmpty
                       ? Text('Keine Stunden')
                       : ListView.builder(
-                        shrinkWrap: true,
-                        padding: const EdgeInsets.all(20),
+                        shrinkWrap: true,                     
+                        padding: const EdgeInsets.all(10),
                         itemCount: stundenplan.length,
                         itemBuilder: (context, index) {
                           final stunde = stundenplan[index];
@@ -104,7 +104,10 @@ class _StundenplanSeiteState extends State<StundenplanSeite> {
                             future: bekommeFachVonId(stunde.fachid),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
-                                return StundenplanKarte(fach: snapshot.data!, tag: ausgewaehlterTagIndex, schulstunde: stunde,);
+                                return Padding(
+                                  padding: EdgeInsets.only(bottom: 12),
+                                  child: StundenplanKarte(fach: snapshot.data!, tag: ausgewaehlterTagIndex, schulstunde: stunde,),
+                                );
                               } else {
                                 Fach tempFach = Fach(lehrer: 'Lädt', name: 'Lädt', farbe: '4286279837');
 
@@ -355,7 +358,7 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
   }
 }
 
-class StundenplanKarte extends StatelessWidget {
+class StundenplanKarte extends StatefulWidget {
   const StundenplanKarte({
     super.key,
     required this.schulstunde,
@@ -368,24 +371,54 @@ class StundenplanKarte extends StatelessWidget {
   final int tag;
 
   @override
+  State<StundenplanKarte> createState() => _StundenplanKarteState();
+}
+
+class _StundenplanKarteState extends State<StundenplanKarte> {
+
+  double berechneZeitFortschritt() {
+    TimeOfDay startzeit = TimeOfDay(hour: widget.schulstunde.startzeit.hour, minute: widget.schulstunde.startzeit.minute);
+    TimeOfDay endzeit = TimeOfDay(hour: widget.schulstunde.endzeit.hour, minute: widget.schulstunde.endzeit.minute);
+    TimeOfDay aktuelleZeit = TimeOfDay.now();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: ((context) => StundenDetails(wochentag: tag, schulstunde: schulstunde, fach: fach))));
+        Navigator.push(context, MaterialPageRoute(builder: ((context) => StundenDetails(wochentag: widget.tag, schulstunde: widget.schulstunde, fach: widget.fach))));
       },
-      child: Card(
-        child: Padding(
-          padding: EdgeInsets.all(10),
-          child: Text(
-            fach.name,
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+      child: (
+        Container(
+          clipBehavior: Clip.hardEdge,
+          //margin: const EdgeInsets.only(bottom: 15),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
           ),
-        ),
-        color: Color(int.parse(fach.farbe)),
+          height: 55,
+          width: double.infinity,
+          child: Stack(
+            alignment: Alignment.centerLeft,
+            children: [
+              Positioned.fill	(
+                child: LinearProgressIndicator(
+                  value: 0.4,
+                  color: Color(int.parse(widget.fach.farbe)),
+                  backgroundColor: Color(int.parse(widget.fach.farbe)).withAlpha(60),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                child: Text(
+                  widget.fach.name,
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+              )
+            ],
+          ),
+        )
       ),
     );
   }
