@@ -41,6 +41,7 @@ dependencies:
   google_fonts: ^3.0.1
   dynamic_color: ^1.5.4
   flutter_colorpicker: ^1.0.3
+  timer_builder: ^2.0.0
 
 dev_dependencies:
   flutter_test:

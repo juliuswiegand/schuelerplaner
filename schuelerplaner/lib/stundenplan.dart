@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:schuelerplaner/modelle/stundenplanmodell.dart';
 import 'package:schuelerplaner/db/datenbank.dart';
 import 'package:schuelerplaner/main.dart';
+import 'package:timer_builder/timer_builder.dart';
 
 class StundenplanSeite extends StatefulWidget {
   const StundenplanSeite({
@@ -417,10 +418,15 @@ class _StundenplanKarteState extends State<StundenplanKarte> {
             alignment: Alignment.centerLeft,
             children: [
               Positioned.fill	(
-                child: LinearProgressIndicator(
-                  value: berechneZeitFortschritt(),
-                  color: Color(int.parse(widget.fach.farbe)),
-                  backgroundColor: Color(int.parse(widget.fach.farbe)).withAlpha(60),
+                child: TimerBuilder.periodic(
+                  Duration(minutes: 1),
+                  builder: (context) {
+                    return LinearProgressIndicator(
+                      value: berechneZeitFortschritt(),
+                      color: Color(int.parse(widget.fach.farbe)),
+                      backgroundColor: Color(int.parse(widget.fach.farbe)).withAlpha(60),
+                    );
+                  },
                 ),
               ),
               Padding(
