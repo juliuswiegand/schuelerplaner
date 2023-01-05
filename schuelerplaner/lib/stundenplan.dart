@@ -377,9 +377,25 @@ class StundenplanKarte extends StatefulWidget {
 class _StundenplanKarteState extends State<StundenplanKarte> {
 
   double berechneZeitFortschritt() {
-    TimeOfDay startzeit = TimeOfDay(hour: widget.schulstunde.startzeit.hour, minute: widget.schulstunde.startzeit.minute);
-    TimeOfDay endzeit = TimeOfDay(hour: widget.schulstunde.endzeit.hour, minute: widget.schulstunde.endzeit.minute);
-    TimeOfDay aktuelleZeit = TimeOfDay.now();
+    DateTime startzeit = widget.schulstunde.startzeit;
+    DateTime endzeit = widget.schulstunde.endzeit;
+    DateTime aktuelleZeit = DateTime(2000, 1, 1, TimeOfDay.now().hour, TimeOfDay.now().minute);
+
+    Duration differenz = startzeit.difference(endzeit);
+    int differenzInMinuten = differenz.inMinutes;
+
+    Duration aktuelleDifferenz = startzeit.difference(aktuelleZeit);
+    int aktuelleDifferenzInMinuten = aktuelleDifferenz.inMinutes;
+    //print(aktuelleDifferenzInMinuten);
+
+    if (differenzInMinuten == 0) {
+      return 1;
+    }
+
+    double prozentualerFortschritt = aktuelleDifferenzInMinuten / differenzInMinuten;
+
+    print(prozentualerFortschritt);
+    return prozentualerFortschritt;
   }
 
   @override
@@ -402,7 +418,7 @@ class _StundenplanKarteState extends State<StundenplanKarte> {
             children: [
               Positioned.fill	(
                 child: LinearProgressIndicator(
-                  value: 0.4,
+                  value: berechneZeitFortschritt(),
                   color: Color(int.parse(widget.fach.farbe)),
                   backgroundColor: Color(int.parse(widget.fach.farbe)).withAlpha(60),
                 ),
