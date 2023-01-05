@@ -87,7 +87,7 @@ class _StundenplanSeiteState extends State<StundenplanSeite> {
             child: SafeArea(
               child: ListView(
                 physics: BouncingScrollPhysics(),
-                padding: const EdgeInsets.all(25),
+                padding: const EdgeInsets.all(20),
                 children: [
                   WeekdayCarousel(tagAktualisert: tagAktualisert,),
                   amLaden
@@ -118,8 +118,6 @@ class _StundenplanSeiteState extends State<StundenplanSeite> {
                           );
                         },
                       ),
-
-                  
                 ],
               ),
             )),
@@ -140,67 +138,96 @@ class StundenDetails extends StatelessWidget {
   final Fach fach;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          stops: [0, 0.4, 1],
-          colors: [
-            Color(int.parse(fach.farbe)),
-            Theme.of(context).scaffoldBackgroundColor,
-            Theme.of(context).scaffoldBackgroundColor,
-          ]
-        )
-      ),
-      child: Scaffold(
+  Widget build(BuildContext context) {   
+      return Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 0,
+          backgroundColor: Color(int.parse(fach.farbe)),
+        ),
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.edit),
+          backgroundColor: Color(int.parse(fach.farbe)).withAlpha(150),
+          child: Icon(Icons.edit, color: Colors.white,),
           onPressed: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) => StundeBearbeitenSeite(ausgewaehlterTag: wochentag, schulstunde: schulstunde, fach: fach)));
           },
         ),
-        backgroundColor: Colors.transparent,
+        //backgroundColor: Colors.transparent,
         body: SafeArea(
           child: Padding(
-            padding: EdgeInsets.all(35),
+            padding: EdgeInsets.symmetric(horizontal: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  fach.name,
-                  style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Colors.white,),
+                Stack(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          stops: [0, 1],
+                          colors: [
+                            Color(int.parse(fach.farbe)),
+                            Color(int.parse(fach.farbe)).withAlpha(80),
+                          ]
+                        ),
+                        //color: Colors.yellow,
+                        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(50), bottomRight: Radius.circular(50))
+                      ),
+                      height: 200,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(30),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            fach.name,
+                            style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Colors.white,),
+                          ),
+                          Text(
+                            fach.lehrer,
+                            style: TextStyle(fontSize: 20, color: Colors.white,),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
                 ),
-                Text(
-                  'Lehrer: ' + fach.lehrer,
-                  style: TextStyle(fontSize: 20, color: Colors.white,),
-                ),
-                SizedBox(height: 150),
-                Text(
-                  'Raum: ' + schulstunde.raum,
-                  style: TextStyle(fontSize: 20),
+                SizedBox(height: 50),
+                Row(
+                  children: [
+                    Icon(Icons.room_rounded, size: 32,),
+                    SizedBox(width: 10,),
+                    Text(schulstunde.raum, style: TextStyle(fontSize: 25),)
+                  ],
                 ),
                 SizedBox(height: 20,),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    Icon(Icons.schedule, size: 32,),
+                    SizedBox(width: 10,),
                     Text(
                       schulstunde.startzeit.hour.toString().padLeft(2, '0') + ':' + schulstunde.startzeit.minute.toString().padLeft(2, '0'),
-                      style: TextStyle(fontSize: 20),
+                      style: TextStyle(fontSize: 25),
                     ),
-                    Icon(Icons.arrow_forward),
+                    SizedBox(width: 15,),
+                    Icon(Icons.chevron_right),
+                    SizedBox(width: 15,),
                     Text(
                       schulstunde.endzeit.hour.toString().padLeft(2, '0') + ':' + schulstunde.endzeit.minute.toString().padLeft(2, '0'),
-                      style: TextStyle(fontSize: 20),
+                      style: TextStyle(fontSize: 25),
                     ),
+                    LinearProgressIndicator(
+                      
+                    )
                   ],
                 )
               ],
             ),
           ),
         ),
-      ),
     );
   }
 }
