@@ -138,96 +138,140 @@ class StundenDetails extends StatelessWidget {
   final Fach fach;
 
   @override
-  Widget build(BuildContext context) {   
-      return Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 0,
-          backgroundColor: Color(int.parse(fach.farbe)),
-        ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Color(int.parse(fach.farbe)).withAlpha(150),
-          child: Icon(Icons.edit, color: Colors.white,),
-          onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => StundeBearbeitenSeite(ausgewaehlterTag: wochentag, schulstunde: schulstunde, fach: fach)));
-          },
-        ),
-        //backgroundColor: Colors.transparent,
-        body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Stack(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          stops: [0, 1],
-                          colors: [
-                            Color(int.parse(fach.farbe)),
-                            Color(int.parse(fach.farbe)).withAlpha(80),
-                          ]
+  Widget build(BuildContext context) {
+
+    double berechneZeitFortschritt() {
+      DateTime startzeit = schulstunde.startzeit;
+      DateTime endzeit = schulstunde.endzeit;
+      DateTime aktuelleZeit = DateTime(2000, 1, 1, TimeOfDay.now().hour, TimeOfDay.now().minute);
+
+      Duration differenz = startzeit.difference(endzeit);
+      int differenzInMinuten = differenz.inMinutes;
+
+      Duration aktuelleDifferenz = startzeit.difference(aktuelleZeit);
+      int aktuelleDifferenzInMinuten = aktuelleDifferenz.inMinutes;
+      //print(aktuelleDifferenzInMinuten);
+
+      if (differenzInMinuten == 0) {
+        return 1;
+      }
+
+      double prozentualerFortschritt = aktuelleDifferenzInMinuten / differenzInMinuten;
+
+      print(prozentualerFortschritt);
+      return prozentualerFortschritt;
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 0,
+        backgroundColor: Color(int.parse(fach.farbe)),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Color(int.parse(fach.farbe)).withAlpha(150),
+        child: Icon(Icons.edit, color: Colors.white,),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => StundeBearbeitenSeite(ausgewaehlterTag: wochentag, schulstunde: schulstunde, fach: fach)));
+        },
+      ),
+      //backgroundColor: Colors.transparent,
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        stops: [0, 1],
+                        colors: [
+                          Color(int.parse(fach.farbe)),
+                          Color(int.parse(fach.farbe)).withAlpha(80),
+                        ]
+                      ),
+                      //color: Colors.yellow,
+                      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(40), bottomRight: Radius.circular(40))
+                    ),
+                    height: 200,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(30),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          fach.name,
+                          style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Colors.white,),
                         ),
-                        //color: Colors.yellow,
-                        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(50), bottomRight: Radius.circular(50))
+                        Text(
+                          fach.lehrer,
+                          style: TextStyle(fontSize: 20, color: Colors.white,),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 30),
+                child: Stack(
+                  children: [ 
+                    ClipRRect(
+                      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(500), bottomRight: Radius.circular(500)),
+                      child: LinearProgressIndicator(
+                        minHeight: 30,
+                        valueColor: AlwaysStoppedAnimation<Color>(Color(int.parse(fach.farbe))),
+                        backgroundColor: Color(int.parse(fach.farbe)).withAlpha(50),
+                        value: berechneZeitFortschritt(),
                       ),
-                      height: 200,
                     ),
-                    Padding(
-                      padding: EdgeInsets.all(30),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            fach.name,
-                            style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: Colors.white,),
-                          ),
-                          Text(
-                            fach.lehrer,
-                            style: TextStyle(fontSize: 20, color: Colors.white,),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
+                    Center(
+                      child: Text(
+                        '3%',
+                        style: TextStyle(fontSize: 20,),
+                      )
+                    ),
+                  ]
                 ),
-                SizedBox(height: 50),
-                Row(
-                  children: [
-                    Icon(Icons.room_rounded, size: 32,),
-                    SizedBox(width: 10,),
-                    Text(schulstunde.raum, style: TextStyle(fontSize: 25),)
-                  ],
-                ),
-                SizedBox(height: 20,),
-                Row(
-                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Icon(Icons.schedule, size: 32,),
-                    SizedBox(width: 10,),
-                    Text(
-                      schulstunde.startzeit.hour.toString().padLeft(2, '0') + ':' + schulstunde.startzeit.minute.toString().padLeft(2, '0'),
-                      style: TextStyle(fontSize: 25),
-                    ),
-                    SizedBox(width: 15,),
-                    Icon(Icons.chevron_right),
-                    SizedBox(width: 15,),
-                    Text(
-                      schulstunde.endzeit.hour.toString().padLeft(2, '0') + ':' + schulstunde.endzeit.minute.toString().padLeft(2, '0'),
-                      style: TextStyle(fontSize: 25),
-                    ),
-                    LinearProgressIndicator(
-                      
-                    )
-                  ],
-                )
-              ],
-            ),
+              ),
+              SizedBox(height: 50),
+              Row(
+                children: [
+                  Icon(Icons.room_rounded, size: 32,),
+                  SizedBox(width: 10,),
+                  Text(schulstunde.raum, style: TextStyle(fontSize: 25),)
+                ],
+              ),
+              SizedBox(height: 20,),
+              Row(
+                //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(Icons.schedule, size: 32,),
+                  SizedBox(width: 10,),
+                  Text(
+                    schulstunde.startzeit.hour.toString().padLeft(2, '0') + ':' + schulstunde.startzeit.minute.toString().padLeft(2, '0'),
+                    style: TextStyle(fontSize: 25),
+                  ),
+                  SizedBox(width: 15,),
+                  Icon(Icons.chevron_right),
+                  SizedBox(width: 15,),
+                  Text(
+                    schulstunde.endzeit.hour.toString().padLeft(2, '0') + ':' + schulstunde.endzeit.minute.toString().padLeft(2, '0'),
+                    style: TextStyle(fontSize: 25),
+                  ),
+                ],
+              ),
+              SizedBox(height: 5,),
+              
+            ],
           ),
         ),
+      ),
     );
   }
 }
