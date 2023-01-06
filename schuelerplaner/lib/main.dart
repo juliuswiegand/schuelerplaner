@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:schuelerplaner/db/datenbank.dart';
+import 'package:schuelerplaner/modelle/stundenplanmodell.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -105,54 +107,120 @@ class _HomescreenState extends State<Homescreen> {
   }
 }
 
-class Dashboard extends StatelessWidget {
+class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
+
+  @override
+  State<Dashboard> createState() => _DashboardState();
+}
+
+class _DashboardState extends State<Dashboard> {
+  String begruessung() {
+    var hour = DateTime.now().hour;
+    if (hour < 12) {
+      return 'Guten Morgen,';
+    }
+    if (hour < 17) {
+      return 'Guten Tag,';
+    }
+    return 'Guten Abend,';
+  }
+
+  Future<List<Widget>> bekommeNaechstenStunden() async {
+    List<Widget> naechstenStundenKarten = [];
+    List<Fach> alleFaecher = [];
+    List<Schulstunde> naechstenStunden = [];
+    List<Schulstunde> naechstenStundenAlle = [];
+    final int aktuellerTagIndex = DateTime.now().weekday - 1;
+
+    naechstenStundenAlle = await Datenbank.instance.alleStundenAuslesen(aktuellerTagIndex);
+
+    DateTime aktuelleZeit = DateTime(2000, 1, 1, TimeOfDay.now().hour, TimeOfDay.now().minute);
+
+    // sortiere stunden aus die schon stattgefunden haben
+    for (var i = 0; i < naechstenStundenAlle.length; i++) {
+      if (naechstenStundenAlle[i].endzeit.isAfter(aktuelleZeit)) {
+        naechstenStunden.add(naechstenStundenAlle[i]);
+      }
+    }
+
+    // lade die fachobjekte der schulstunden
+    for (var i = 0; i < naechstenStunden.length; i++) {
+      Fach? fach = await Datenbank.instance.fachAuslesen(naechstenStunden[i].fachid);
+      alleFaecher.add(fach!);
+    }
+
+    // wenn liste lehr zeig benutzer das er keine stunden mehr hat
+    if (naechstenStunden.length == 0) {
+      return [];
+    }
+
+    // zeige nur die naechsten 3 stunden
+    for (var i = 0; i < naechstenStunden.length; i++) {
+      if (i <= 2) {
+        naechstenStundenKarten.add(naechsteStundeKarte(
+          fachname: alleFaecher[i].name,
+          farbe: alleFaecher[i].farbe,
+          startzeit: naechstenStunden[i].startzeit,
+          endzeit: naechstenStunden[i].endzeit,
+          raum: naechstenStunden[i].raum,
+        ));
+        naechstenStundenKarten.add(SizedBox(height: 7,));
+      }
+    }
+
+    return naechstenStundenKarten;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       alignment: Alignment.topLeft,
       child: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(25),
-          children: [
-            // Begruessung des Users
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.topLeft,
-              child: Text(
-                'Hallo,',
-                style: Theme.of(context).textTheme.headline3,
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [ 
+              Container(
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: IconButton(
+                    iconSize: 30,
+                    style: ButtonStyle(
+                      side: MaterialStatePropertyAll(
+                        BorderSide(
+                          color: Colors.white.withAlpha(50),
+                        ),
+                      )
+                    ),
+                    icon: Icon(Icons.settings),
+                    onPressed: () {
+                      print('Pressed');
+                    },
+                  ),
+                ),
               ),
-            ),
-            GradientText(
-              'Cedric',
-              gradientDirection: GradientDirection.ltr,
-              gradientType: GradientType.radial,
-              radius: 6,
-              style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-              colors: [
-                Color.fromARGB(255, 7, 235, 94), 
-                Color.fromARGB(255, 110, 226, 197)
-              ]
-            ),
+              Text(begruessung(), style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),),
 
-            SizedBox(height: 25,),
+              SizedBox(height: 40,),
 
-            // auflistung nächster Stunden
-            Text(
-              'Deine nächsten Stunden:',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-
-            SizedBox(height: 10),
-
-            naechsteStundeKarte(),
-            naechsteStundeKarte(),
-
-            SizedBox(height: 30),
-            
-          ],
+              Text('Deine nächsten Stunden:', style: TextStyle(fontSize: 19),),
+              SizedBox(height: 12,),
+              
+              FutureBuilder(
+                future: bekommeNaechstenStunden(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: snapshot.data!,
+                    );
+                  } else {
+                    return Text('Lädt...');
+                  }
+                })           
+            ]
+          ),
         ),
       ),
     );
@@ -160,31 +228,93 @@ class Dashboard extends StatelessWidget {
 }
 
 class naechsteStundeKarte extends StatelessWidget {
-  const naechsteStundeKarte({super.key});
+  const naechsteStundeKarte({
+    super.key,
+    required this.fachname,
+    required this.farbe,
+    required this.startzeit,
+    required this.endzeit,
+    required this.raum
+  });
+
+  final String fachname;
+  final String farbe;
+  final DateTime startzeit;
+  final DateTime endzeit;
+  final String raum;
+
+  double berechneZeitFortschritt() {
+    DateTime aktuelleZeit = DateTime(2000, 1, 1, TimeOfDay.now().hour, TimeOfDay.now().minute);
+
+    Duration differenz = startzeit.difference(endzeit);
+    int differenzInMinuten = differenz.inMinutes;
+
+    Duration aktuelleDifferenz = startzeit.difference(aktuelleZeit);
+    int aktuelleDifferenzInMinuten = aktuelleDifferenz.inMinutes;
+    //print(aktuelleDifferenzInMinuten);
+
+    if (differenzInMinuten == 0) {
+      return 1;
+    }
+
+    double prozentualerFortschritt = aktuelleDifferenzInMinuten / differenzInMinuten;
+
+    return prozentualerFortschritt;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 5),
+      clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
-        color: Color.fromARGB(255, 70, 153, 72),
-        borderRadius: BorderRadius.all(Radius.circular(15.0))
+        borderRadius: BorderRadius.circular(20),
       ),
-      child: Padding(
-        padding: EdgeInsets.all(15),
-        child: Text(
-          'Biologie',
-          style: Theme.of(context).textTheme.labelMedium,
-        ),
-      )
+      height: 55,
+      width: double.infinity,
+      child: Stack(
+        alignment: Alignment.centerLeft,
+        children: [
+          LinearProgressIndicator(
+            minHeight: 55,
+            value: berechneZeitFortschritt(),
+            valueColor: AlwaysStoppedAnimation(Color(int.parse(farbe))),
+            backgroundColor: Color(int.parse(farbe)).withAlpha(60),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 17),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    fachname,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Icon(Icons.room, color: Colors.white,),
+                      SizedBox(width: 2,),
+                      Text(
+                        raum,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ]
+                  ),
+                ]
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
-
-
-
-
-
-
-
-

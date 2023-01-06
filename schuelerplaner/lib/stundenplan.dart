@@ -43,7 +43,6 @@ class _StundenplanSeiteState extends State<StundenplanSeite> {
     // lädt eine liste mit allen stunden am aktell ausgewählten tag
     setState(() => amLaden = true);
     this.stundenplan = await Datenbank.instance.alleStundenAuslesen(ausgewaehlterTagIndex);
-    print(stundenplan);
     setState(() => amLaden = false);
   } 
 
@@ -219,10 +218,12 @@ class StundenDetails extends StatelessWidget {
 
       double prozentualerFortschritt = aktuelleDifferenzInMinuten / differenzInMinuten;
 
-      print(prozentualerFortschritt);
 
       if (prozentualerFortschritt > 1) {
         return 1;
+      }
+      if (prozentualerFortschritt < 0) {
+        return 0;
       }
       return prozentualerFortschritt;
     }
@@ -429,7 +430,6 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
 
   void endZeitAuswaehlen(context) async {
     endzeit = (await showTimePicker(context: context, initialTime: TimeOfDay.now()))!;
-    print(endzeit);
     setState(() {});
   }
 
@@ -604,7 +604,6 @@ class _StundenplanKarteState extends State<StundenplanKarte> {
 
     double prozentualerFortschritt = aktuelleDifferenzInMinuten / differenzInMinuten;
 
-    print(prozentualerFortschritt);
     return prozentualerFortschritt;
   }
 
@@ -749,7 +748,6 @@ class _StundeBearbeitenSeite extends State<StundeBearbeitenSeite> {
 
   void endZeitAuswaehlen(context) async {
     endzeit = (await showTimePicker(context: context, initialTime:TimeOfDay(hour: schulstunde.endzeit.hour, minute: schulstunde.endzeit.minute)))!;
-    print(endzeit);
     setState(() {});
   }
 
