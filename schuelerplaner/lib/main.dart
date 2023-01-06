@@ -69,7 +69,8 @@ class _HomescreenState extends State<Homescreen> {
           appBarTheme: AppBarTheme(
             systemOverlayStyle: SystemUiOverlayStyle.dark,
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          )
+          ),
+          dividerColor: Color.fromARGB(134, 102, 102, 102),
         ),
 
         darkTheme: ThemeData(
@@ -80,7 +81,8 @@ class _HomescreenState extends State<Homescreen> {
           ),
           appBarTheme: AppBarTheme(
             systemOverlayStyle: SystemUiOverlayStyle.light,
-          )
+          ),
+          dividerColor: Color.fromARGB(45, 255, 255, 255),
         ),
 
         home: Scaffold(
@@ -156,8 +158,8 @@ class _DashboardState extends State<Dashboard> {
       return [];
     }
 
-    naechstenStundenKarten.add(Text('Deine nächsten Stunden:', style: TextStyle(fontSize: 19),),);
-    naechstenStundenKarten.add(SizedBox(height: 12,),);
+    //naechstenStundenKarten.add(Text('Deine nächsten Stunden:', style: TextStyle(fontSize: 19),),);
+    //naechstenStundenKarten.add(SizedBox(height: 12,),);
 
     // zeige nur die naechsten 3 stunden
     for (var i = 0; i < naechstenStunden.length; i++) {
@@ -211,39 +213,49 @@ class _DashboardState extends State<Dashboard> {
 
               SizedBox(height: 40,),
 
-              
-              
-              TimerBuilder.periodic(
-                Duration(minutes: 1),
-                builder: (context) {
-                  return FutureBuilder(
-                    future: bekommeNaechstenStunden(),
-                    builder: (context, snapshot) {
-                      print(snapshot.data);
-                      if (snapshot.hasData) {
-                        if (snapshot.data!.length != 0) {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: snapshot.data!,
-                          );
-                        } else {
-                          return Center(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SizedBox(height: 0,),
-                                Icon(Icons.check, color: Colors.white.withAlpha(100), size: 50,),
-                                Text('Heute hast du keine Stunden mehr', style: TextStyle(color: Colors.white.withAlpha(150), fontSize: 15),)
-                              ],
-                            ),
-                          );
+              Text('Deine nächsten Stunden:', style: TextStyle(fontSize: 19),),
+              SizedBox(height: 12,),
+
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).dividerColor, width: 2),             
+                  borderRadius: BorderRadius.circular(30)
+                ),
+                child: Padding(
+                  padding: EdgeInsets.only(top: 15, bottom: 10, left: 15, right: 15),
+                  child: TimerBuilder.periodic(
+                    Duration(minutes: 1),
+                    builder: (context) {
+                      return FutureBuilder(
+                        future: bekommeNaechstenStunden(),
+                        builder: (context, snapshot) {
+                          print(snapshot.data);
+                          if (snapshot.hasData) {
+                            if (snapshot.data!.length != 0) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: snapshot.data!,
+                              );
+                            } else {
+                              return Center(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(height: 0,),
+                                    Icon(Icons.check, color: Colors.white.withAlpha(100), size: 50,),
+                                    Text('Heute hast du keine Stunden mehr', style: TextStyle(color: Colors.white.withAlpha(150), fontSize: 15),)
+                                  ],
+                                ),
+                              );
+                            }
+                          } else {
+                            return Text('Lädt...');
+                          }
                         }
-                      } else {
-                        return Text('Lädt...');
-                      }
-                    }
-                  );
-                },           
+                      );
+                    },           
+                  ),
+                ),
               )           
             ]
           ),
