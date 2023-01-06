@@ -5,6 +5,7 @@ import 'package:schuelerplaner/main.dart';
 import 'package:timer_builder/timer_builder.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:schuelerplaner/farbManipulation.dart';
+import 'package:flutter/services.dart';
 
 class StundenplanSeite extends StatefulWidget {
   const StundenplanSeite({
@@ -125,56 +126,56 @@ class _StundenplanSeiteState extends State<StundenplanSeite> {
           child: Icon(Icons.add),
           heroTag: 'NeueStundeSeite',
         ),
-        body: Container(
-            child: SafeArea(
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    WochentagAuswahl(tagAktualisert: tagAktualisert,),
-                    SizedBox(height: 30,),
-
-                    amLaden
-                      ? CircularProgressIndicator()
-                      : stundenplan.isEmpty
-                        ? Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.error_outline, size: 80,),
-                                SizedBox(height: 10,),
-                                Text('Noch keine Stunden hinzugefügt', style: TextStyle(fontSize: 17),)
-                              ],
-                            ),
-                          )
-                        : ListView.builder(
-                          shrinkWrap: true,                     
-                          padding: const EdgeInsets.all(10),
-                          itemCount: stundenplan.length,
-                          itemBuilder: (context, index) {
-                            final stunde = stundenplan[index];
-                            // wartet bis der fachname anhand der id in der datenbank gefunden wurde um diesen anzuzeigen
-                            return FutureBuilder(
-                              future: bekommeFachVonId(stunde.fachid),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  return Padding(
-                                    padding: EdgeInsets.only(bottom: 12),
-                                    child: StundenplanKarte(fach: snapshot.data!, tag: ausgewaehlterTagIndex, schulstunde: stunde,),
-                                  );
-                                } else {
-                                  Fach tempFach = Fach(lehrer: 'Lädt', name: 'Lädt', farbe: '4286279837');
-              
-                                  return StundenplanKarte(fach: tempFach, tag: ausgewaehlterTagIndex, schulstunde: stunde,);
-                                }
-                              },
-                            );
-                          },
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.all(15),
+            child: Column(
+              children: [
+                WochentagAuswahl(tagAktualisert: tagAktualisert,),
+                SizedBox(height: 15,),
+                amLaden
+                  ? CircularProgressIndicator()
+                  : stundenplan.isEmpty
+                    ? Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.error_outline, size: 80,),
+                            SizedBox(height: 10,),
+                            Text('Noch keine Stunden hinzugefügt', style: TextStyle(fontSize: 17),)
+                          ],
                         ),
-                  ],
-                ),
-              ),
-            )),
+                      )
+                    : Expanded(
+                      child: ListView.builder(
+                        shrinkWrap: true,                     
+                        padding: const EdgeInsets.all(10),
+                        itemCount: stundenplan.length,
+                        itemBuilder: (context, index) {
+                          final stunde = stundenplan[index];
+                          // wartet bis der fachname anhand der id in der datenbank gefunden wurde um diesen anzuzeigen
+                          return FutureBuilder(
+                            future: bekommeFachVonId(stunde.fachid),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return Padding(
+                                  padding: EdgeInsets.only(bottom: 8),
+                                  child: StundenplanKarte(fach: snapshot.data!, tag: ausgewaehlterTagIndex, schulstunde: stunde,),
+                                );
+                              } else {
+                                Fach tempFach = Fach(lehrer: 'Lädt', name: 'Lädt', farbe: '4286279837');
+                              
+                                return StundenplanKarte(fach: tempFach, tag: ausgewaehlterTagIndex, schulstunde: stunde,);
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    ),
+              ]
+            ),
+          ),
+        ),
       );
   }
 }
@@ -219,13 +220,21 @@ class StundenDetails extends StatelessWidget {
       double prozentualerFortschritt = aktuelleDifferenzInMinuten / differenzInMinuten;
 
       print(prozentualerFortschritt);
+
+      if (prozentualerFortschritt > 1) {
+        return 1;
+      }
       return prozentualerFortschritt;
     }
 
     return Scaffold(
       appBar: AppBar(
+        systemOverlayStyle: SystemUiOverlayStyle.light,
         toolbarHeight: 50,
         backgroundColor: Color(int.parse(fach.farbe)),
+        leading: BackButton(
+          color: Colors.white,
+        ),
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -265,10 +274,9 @@ class StundenDetails extends StatelessWidget {
                         stops: [0, 1],
                         colors: [
                           Color(int.parse(fach.farbe)),
-                          Color(int.parse(fach.farbe)).withAlpha(80),
+                          farbeVerdunkeln(Color(int.parse(fach.farbe)), 0.1),
                         ]
                       ),
-                      //color: Colors.yellow,
                       borderRadius: BorderRadius.only(bottomLeft: Radius.circular(40), bottomRight: Radius.circular(40))
                     ),
                     height: 200,
@@ -299,7 +307,7 @@ class StundenDetails extends StatelessWidget {
                 Duration(minutes: 1),
                 builder: (context) {
                   return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 30),
+                  padding: EdgeInsets.symmetric(horizontal: 35),
                   child: Stack(
                     children: [ 
                       ClipRRect(
@@ -449,12 +457,13 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
       decoration: BoxDecoration(
         border: Border.all(width: 3, color: Color(int.parse(ausgewaehltesFach.farbe))),
         borderRadius: BorderRadius.circular(30),
-        color: farbeVerdunkeln(Color(int.parse(ausgewaehltesFach.farbe)), 0.4)
+        color: farbeVerdunkeln(Color(int.parse(ausgewaehltesFach.farbe)), 0.18)
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 17, vertical: 11),
         child: DropdownButton(
-          style: TextStyle(fontSize: 18),
+          style: Theme.of(context).textTheme.labelMedium,
+          dropdownColor: farbeVerdunkeln(Color(int.parse(ausgewaehltesFach.farbe)), 0.18),
           isExpanded: true,
           underline: Container(),
           value: ausgewaehltesFach,
@@ -601,51 +610,72 @@ class _StundenplanKarteState extends State<StundenplanKarte> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: ((context) => StundenDetails(wochentag: widget.tag, schulstunde: widget.schulstunde, fach: widget.fach))));
-      },
-      child: (
-        Container(
-          clipBehavior: Clip.hardEdge,
-          //margin: const EdgeInsets.only(bottom: 15),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          height: 55,
-          width: double.infinity,
-          child: Stack(
-            alignment: Alignment.centerLeft,
-            children: [
-              Positioned.fill	(
-                child: TimerBuilder.periodic(
-                  Duration(minutes: 1),
-                  builder: (context) {
-                    return LinearProgressIndicator(
-                      value: berechneZeitFortschritt(),
-                      valueColor: AlwaysStoppedAnimation(Color(int.parse(widget.fach.farbe))),
-                      backgroundColor: Color(int.parse(widget.fach.farbe)).withAlpha(60),
-                    );
-                  },
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Center(
-                    child: Text(
-                      widget.fach.name,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+    return Card(
+      elevation: 10,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: ((context) => StundenDetails(wochentag: widget.tag, schulstunde: widget.schulstunde, fach: widget.fach))));
+        },
+        child: (
+          Container(
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            height: 55,
+            width: double.infinity,
+            child: Stack(
+              alignment: Alignment.centerLeft,
+              children: [
+                Positioned.fill	(
+                  child: TimerBuilder.periodic(
+                    Duration(minutes: 1),
+                    builder: (context) {
+                      return LinearProgressIndicator(
+                        value: berechneZeitFortschritt(),
+                        valueColor: AlwaysStoppedAnimation(Color(int.parse(widget.fach.farbe))),
+                        backgroundColor: Color(int.parse(widget.fach.farbe)).withAlpha(60),
+                      );
+                    },
                   ),
                 ),
-            ],
-          ),
-        )
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 17),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          widget.fach.name,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Icon(Icons.room, color: Colors.white,),
+                            SizedBox(width: 2,),
+                            Text(
+                              widget.schulstunde.raum,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ]
+                        ),
+                      ]
+                    ),
+                  ),
+              ],
+            ),
+          )
+        ),
       ),
     );
   }
@@ -750,7 +780,8 @@ class _StundeBearbeitenSeite extends State<StundeBearbeitenSeite> {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 17, vertical: 11),
         child: DropdownButton(
-          style: TextStyle(fontSize: 18),
+          style: Theme.of(context).textTheme.labelMedium,
+          dropdownColor: farbeVerdunkeln(Color(int.parse(ausgewaehltesFach.farbe)), 0.18),
           isExpanded: true,
           underline: Container(),
           value: ausgewaehltesFach,

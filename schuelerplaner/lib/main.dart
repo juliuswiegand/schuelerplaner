@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -59,14 +60,30 @@ class _HomescreenState extends State<Homescreen> {
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: lightColorScheme,
+          textTheme: TextTheme(
+            labelMedium: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          appBarTheme: AppBarTheme(
+            systemOverlayStyle: SystemUiOverlayStyle.dark,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          )
         ),
 
         darkTheme: ThemeData(
           useMaterial3: true,
           colorScheme: darkColorScheme,
+          textTheme: TextTheme(
+            labelMedium: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          appBarTheme: AppBarTheme(
+            systemOverlayStyle: SystemUiOverlayStyle.light,
+          )
         ),
 
         home: Scaffold(
+          appBar: AppBar(
+            toolbarHeight: 0,
+          ),
           body: [Dashboard(), StundenplanSeite(), FachUebersicht()][currentPageIndex],
           bottomNavigationBar: NavigationBar(
             onDestinationSelected: (int index) {

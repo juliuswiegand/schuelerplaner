@@ -195,7 +195,7 @@ class _NeuesFachSeiteState extends State<NeuesFachSeite> {
                         top: BorderSide(color: Colors.grey),
                       ),
                     ),
-                    child: Icon(Icons.color_lens),
+                    child: Icon(Icons.color_lens, color: Colors.white,),
                   ),
                 ),
                 SizedBox(height: 55,),
@@ -248,27 +248,30 @@ class FachKarte extends StatelessWidget {
         Navigator.push(context, MaterialPageRoute(builder: (context) => FachDetails(fach: fach)));
       },
       child: Card(
+        elevation: 5,
         child: Padding(
-          padding: EdgeInsets.only(left: 12),
+          padding: EdgeInsets.only(left: 15, top: 10, bottom: 10, right: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             //crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Flexible(
-                child: Text(
-                  fach.name,
-                  style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
-                  overflow: TextOverflow.ellipsis,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                    Text(
+                      fach.name,
+                      style: TextStyle(fontSize: 25, color: Colors.white, fontWeight: FontWeight.bold),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      fach.lehrer,
+                      style: TextStyle(fontSize: 15, color: Colors.white),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
               ),
-              Flexible(
-                child: Text(
-                  fach.lehrer,
-                  style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.bold),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              IconButton(onPressed: delete, icon: Icon(Icons.delete), color: Color.fromARGB(255, 255, 255, 255),)
+              
+              IconButton(onPressed: delete, icon: Icon(Icons.delete, size: 30,), color: Color.fromARGB(255, 255, 255, 255),)
             ]
           )
         ),
@@ -413,7 +416,7 @@ class _FachBearbeitenSeite extends State<FachBearbeitenSeite> {
                         top: BorderSide(color: Colors.grey),
                       ),
                     ),
-                    child: Icon(Icons.color_lens),
+                    child: Icon(Icons.color_lens, color: Colors.white,),
                   ),
                 ),
                 SizedBox(height: 55,),
@@ -475,6 +478,9 @@ class _FachDetailsState extends State<FachDetails> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Color(int.parse(widget.fach.farbe)),
+          leading: BackButton(
+            color: Colors.white,
+          ),
         ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.edit),
