@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:schuelerplaner/db/datenbank.dart';
-import 'package:schuelerplaner/modelle/stundenplanmodell.dart';
+import 'package:schuelerplaner/modelle/datenbankmodell.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,6 +11,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:schuelerplaner/stundenplan.dart';
 import 'package:schuelerplaner/fachuebersicht.dart';
 import 'package:timer_builder/timer_builder.dart';
+import 'package:schuelerplaner/hausaufgabenuebersicht.dart';
 
 Database? datenbank;
 
@@ -89,7 +90,7 @@ class _HomescreenState extends State<Homescreen> {
           appBar: AppBar(
             toolbarHeight: 0,
           ),
-          body: [Dashboard(), StundenplanSeite(), FachUebersicht()][currentPageIndex],
+          body: [Dashboard(), StundenplanSeite(), FachUebersicht(), HausaufgabenSeite()][currentPageIndex],
           bottomNavigationBar: NavigationBar(
             onDestinationSelected: (int index) {
               setState(() {
@@ -101,7 +102,8 @@ class _HomescreenState extends State<Homescreen> {
             destinations: [
               NavigationDestination(icon: Icon(Icons.home,), label: 'Dashboard'),
               NavigationDestination(icon: Icon(Icons.calendar_today), label: 'Stundenplan'),
-              NavigationDestination(icon: Icon(Icons.list), label: 'Faecher')
+              NavigationDestination(icon: Icon(Icons.list), label: 'Fächer'),
+              NavigationDestination(icon: Icon(Icons.task), label: 'Hausaufgaben')
             ],
           ),
         ));

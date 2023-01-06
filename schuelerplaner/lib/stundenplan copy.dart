@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:schuelerplaner/modelle/stundenplanmodell.dart';
+import 'package:schuelerplaner/modelle/datenbankmodell.dart';
 import 'package:schuelerplaner/db/datenbank.dart';
 import 'package:schuelerplaner/main.dart';
 import 'package:timer_builder/timer_builder.dart';

@@ -1,4 +1,5 @@
 final String fachTabelle = 'faecher';
+final String hausaufgabenTabelle = 'hausaufgaben';
 final String montagTabelle = 'montag';
 final String dienstagTabelle = 'dienstag';
 final String mittwochTabelle = 'mittwoch';
@@ -28,6 +29,19 @@ class SchulstundeFelder {
   static final String raum = 'raum';
   static final String startzeit = 'startzeit';
   static final String endzeit = 'endzeit';
+}
+
+class HausaufgabeFelder {
+  static final List<String> werte = [
+    id, fachid, erledigt, erstellungsZeitpunkt, abgabeZeitpunkt, aufgabe
+  ];
+
+  static final String id = '_id';
+  static final String fachid = 'fachid';
+  static final String erledigt = 'erledigt';
+  static final String erstellungsZeitpunkt = 'erstellungsZeitpunkt';
+  static final String abgabeZeitpunkt = 'abgabeZeitpunkt';
+  static final String aufgabe = 'aufgabe';
 }
 
 class Fach {
@@ -115,5 +129,58 @@ class Schulstunde {
     raum: raum ?? this.raum,
     startzeit: startzeit ?? this.startzeit,
     endzeit: endzeit ?? this.endzeit,
+  );
+}
+
+class Hausaufgabe {
+  final int? id;
+  final int fachid;
+  final bool erledigt;
+  final DateTime erstellungsZeitpunkt;
+  final DateTime abgabeZeitpunkt;
+  final String aufgabe;
+
+  const Hausaufgabe ({
+    this.id,
+    required this.fachid,
+    required this.erledigt,
+    required this.erstellungsZeitpunkt,
+    required this.abgabeZeitpunkt,
+    required this.aufgabe,
+  });
+
+  static Hausaufgabe vonJson(Map<String, Object?> json) => Hausaufgabe(
+    id: json[HausaufgabeFelder.id] as int,
+    fachid: json[HausaufgabeFelder.fachid] as int,
+    aufgabe: json[HausaufgabeFelder.aufgabe] as String,
+    erstellungsZeitpunkt: DateTime.parse(json[HausaufgabeFelder.erstellungsZeitpunkt] as String),
+    abgabeZeitpunkt: DateTime.parse(json[HausaufgabeFelder.abgabeZeitpunkt] as String),
+    erledigt: json[HausaufgabeFelder.erledigt] == 1,
+  );
+
+  Map<String, Object?> zuJson() => {
+    HausaufgabeFelder.id: id,
+    HausaufgabeFelder.fachid: fachid,
+    HausaufgabeFelder.aufgabe: aufgabe,
+    HausaufgabeFelder.erledigt: erledigt ? 1 : 0,
+    HausaufgabeFelder.erstellungsZeitpunkt: erstellungsZeitpunkt.toIso8601String(),
+    HausaufgabeFelder.abgabeZeitpunkt: abgabeZeitpunkt.toIso8601String(),
+  };
+
+  Hausaufgabe kopie({
+    int? id,
+    int? fachid,
+    String? aufgabe,
+    DateTime? erstellungsZeitpunkt,
+    DateTime? abgabeZeitpunkt,
+    bool? erledigt,
+  }) =>
+  Hausaufgabe(
+    id: id ?? this.id,
+    fachid: fachid ?? this.fachid,
+    aufgabe: aufgabe ?? this.aufgabe,
+    erstellungsZeitpunkt: erstellungsZeitpunkt ?? this.erstellungsZeitpunkt,
+    abgabeZeitpunkt: abgabeZeitpunkt ?? this.abgabeZeitpunkt,
+    erledigt: erledigt ?? this.erledigt,
   );
 }

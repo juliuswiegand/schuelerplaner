@@ -1,6 +1,6 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:schuelerplaner/modelle/stundenplanmodell.dart';
+import 'package:schuelerplaner/modelle/datenbankmodell.dart';
 
 class Datenbank {
   static final Datenbank instance = Datenbank._init();
@@ -26,18 +26,29 @@ class Datenbank {
 
   Future _erstelleDB(Database db, int version) async {
     final idTyp = 'INTEGER PRIMARY KEY AUTOINCREMENT';
-    //final booleanTyp = 'BOOLEAN NOT NULL';
+    final booleanTyp = 'BOOLEAN NOT NULL';
     final intTyp = 'INTEGER NOT NULL';
     final stringTyp = 'TEXT NOT NULL';
 
     //fachtabelle erstellen
     await db.execute('''
-CREATE TABLE $fachTabelle (
-  ${FachFelder.id} $idTyp,
-  ${FachFelder.lehrer} $stringTyp,
-  ${FachFelder.name} $stringTyp,
-  ${FachFelder.farbe} $stringTyp
-  )''');
+    CREATE TABLE $fachTabelle (
+      ${FachFelder.id} $idTyp,
+      ${FachFelder.lehrer} $stringTyp,
+      ${FachFelder.name} $stringTyp,
+      ${FachFelder.farbe} $stringTyp
+    )''');
+
+    // hausaufgabentabelle erstellen
+    await db.execute('''
+    CREATE TABLE $hausaufgabenTabelle (
+      ${HausaufgabeFelder.id} $idTyp,
+      ${HausaufgabeFelder.fachid} $intTyp,
+      ${HausaufgabeFelder.erledigt} $booleanTyp,
+      ${HausaufgabeFelder.erstellungsZeitpunkt} $stringTyp,
+      ${HausaufgabeFelder.abgabeZeitpunkt} $stringTyp,
+      ${HausaufgabeFelder.aufgabe} $stringTyp
+    )''');
 
     //stundenplaene erstellen
     await db.execute('''
@@ -111,6 +122,13 @@ CREATE TABLE $fachTabelle (
     return fach.kopie(id: id);
   }
 
+  Future<Hausaufgabe> hausaufgabeErstellen(Hausaufgabe hausaufgabe) async {
+    final db = await instance.datenbank;
+
+    final id = await db.insert(hausaufgabenTabelle, hausaufgabe.zuJson());
+    return hausaufgabe.kopie(id: id);
+  }
+
   Future<Schulstunde> stundeHinzufuegen(int tagIndex, Schulstunde stunde) async {
     final db = await instance.datenbank;
 
@@ -154,6 +172,17 @@ CREATE TABLE $fachTabelle (
       fach.zuJson(),
       where: '${FachFelder.id} = ?',
       whereArgs: [fach.id],
+    );
+  }
+
+  Future<int> hausaufgabeAktualisieren(Hausaufgabe hausaufgabe) async {
+    final db = await instance.datenbank;
+
+    return db.update(
+      hausaufgabenTabelle,
+      hausaufgabe.zuJson(),
+      where: '${HausaufgabeFelder.id} = ?',
+      whereArgs: [hausaufgabe.id],
     );
   }
 
@@ -267,7 +296,7 @@ CREATE TABLE $fachTabelle (
     }
     if (tagIndex == 6) {
       return await db.delete(
-        donnerstagTabelle,
+        sonntagTabelle,
         where: '${SchulstundeFelder.id} = ?',
         whereArgs: [id],
       );
@@ -283,6 +312,16 @@ CREATE TABLE $fachTabelle (
     return await db.delete(
       fachTabelle,
       where: '${FachFelder.id} = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<int> hausaufgabeLoeschen(int? id) async {
+    final db = await instance.datenbank;
+
+    return await db.delete(
+      hausaufgabenTabelle,
+      where: '${HausaufgabeFelder.id} = ?',
       whereArgs: [id],
     );
   }
@@ -304,10 +343,47 @@ CREATE TABLE $fachTabelle (
     }
   }
 
+  Future<Hausaufgabe?> hausaufgabeAuslesen(int id) async {
+    final db = await instance.datenbank;
+
+    final maps = await db.query(
+      hausaufgabenTabelle,
+      columns: HausaufgabeFelder.werte,
+      where: '${HausaufgabeFelder.id} = ?', // fragezeichen statt $id um sql injection zu vermeiden
+      whereArgs: [id],
+    );
+
+    if (maps.isNotEmpty) {
+      return Hausaufgabe.vonJson(maps.first);
+    } else {
+      return null;
+    }
+  }
+
   Future<List<Fach>> alleFaecherAuslesen() async {
     final db = await instance.datenbank;
     final ergebniss = await db.query(fachTabelle);
     return ergebniss.map((json) => Fach.vonJson(json)).toList();
+  }
+
+  Future<List<Hausaufgabe>> alleNichtErledigtenHausaufgabenAuslesen() async {
+    final db = await instance.datenbank;
+    final ergebniss = await db.query(
+      hausaufgabenTabelle, 
+      where: '${HausaufgabeFelder.erledigt} = ?',
+      whereArgs: [0],
+    );
+    return ergebniss.map((json) => Hausaufgabe.vonJson(json)).toList();
+  }
+
+  Future<List<Hausaufgabe>> alleErledigtenHausaufgabenAuslesen() async {
+    final db = await instance.datenbank;
+    final ergebniss = await db.query(
+      hausaufgabenTabelle, 
+      where: '${HausaufgabeFelder.erledigt} = ?',
+      whereArgs: [1],
+    );
+    return ergebniss.map((json) => Hausaufgabe.vonJson(json)).toList();
   }
 
   Future<List<Schulstunde>> alleStundenAuslesen(int tagIndex) async {

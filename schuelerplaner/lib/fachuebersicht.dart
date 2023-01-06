@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:schuelerplaner/modelle/stundenplanmodell.dart';
+import 'package:schuelerplaner/modelle/datenbankmodell.dart';
 import 'package:schuelerplaner/db/datenbank.dart';
 import 'package:schuelerplaner/main.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -33,7 +33,6 @@ class _FachUebersichtState extends State<FachUebersicht> {
   Future faecherAktualisieren() async {
     setState(() => amLaden = true);
     this.faecher = await Datenbank.instance.alleFaecherAuslesen();
-    print(faecher);
     setState(() => amLaden = false);
   }
 
@@ -428,7 +427,7 @@ class _FachBearbeitenSeite extends State<FachBearbeitenSeite> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.save),
+                      Icon(Icons.update),
                       SizedBox(width: 5,),
                       Text('Speichern')
                     ],
