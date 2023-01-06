@@ -23,7 +23,6 @@ class _StundenplanSeiteState extends State<StundenplanSeite> {
   bool amHinzufuegen = false;
   List<String> alleFachNamen = [];
   late List<Schulstunde> stundenplan;
-  late List<Fach> alleFaecher;
 
   @override
   void initState() {
@@ -32,7 +31,6 @@ class _StundenplanSeiteState extends State<StundenplanSeite> {
     ausgewaehlterTagIndex = aktuellerTagIndex;
 
     tagAktualisert(aktuellerTagIndex);
-    setzeAlleFaecher();
   }
 
   Future tagAktualisert(int tag) async {
@@ -45,14 +43,6 @@ class _StundenplanSeiteState extends State<StundenplanSeite> {
     print(stundenplan);
     setState(() => amLaden = false);
   } 
-
-  Future setzeAlleFaecher() async {
-    this.alleFaecher = await Datenbank.instance.alleFaecherAuslesen();
-  }
-
-  int bekommAnzahlFaecher() {
-    return alleFaecher.length;
-  }
 
   Future<String> bekommeFachNameVonId(int id) async {
     Fach? fach = await Datenbank.instance.fachAuslesen(id);
@@ -81,46 +71,15 @@ class _StundenplanSeiteState extends State<StundenplanSeite> {
     }
   }
   
-  Future<void> zeigeFachFehlermeldung() async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Fehler'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Erstelle zuvor ein Fach bevor du Stunden zuweisen kannst'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            OutlinedButton(
-              child: Text('Okay'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
       return Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            if (bekommAnzahlFaecher() != 0) {
-                Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => NeueStundeHinzufuegen(ausgewaehlterTag: ausgewaehlterTagIndex,))
-              ).then((wert) => {tagAktualisert(ausgewaehlterTagIndex)});
-            } else {
-              print('Es gibt noch keine Faeher');
-              zeigeFachFehlermeldung();
-            }
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => NeueStundeHinzufuegen(ausgewaehlterTag: ausgewaehlterTagIndex,))
+            ).then((wert) => {tagAktualisert(ausgewaehlterTagIndex)});
           }, 
           child: Icon(Icons.add),
           heroTag: 'NeueStundeSeite',
@@ -224,7 +183,7 @@ class StundenDetails extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 50,
+        toolbarHeight: 0,
         backgroundColor: Color(int.parse(fach.farbe)),
       ),
       floatingActionButton: Column(
@@ -429,13 +388,11 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
     setState(() => amLaden = true);
     this.alleFaecher = await Datenbank.instance.alleFaecherAuslesen(); 
     setState(() => amLaden = false);
-    
   }
 
   DecoratedBox alleFaecherDropdown() {
 
     List<String> alleFachnamen = [];
-    
 
     for (Fach fach in alleFaecher) {
       alleFachnamen.add(fach.name);
@@ -475,6 +432,7 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
     );
   }
 
+  //Future stundeHinzufeugen() async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -729,125 +687,93 @@ class _StundeBearbeitenSeite extends State<StundeBearbeitenSeite> {
     setState(() => amLaden = false);
   }
 
-  DecoratedBox alleFaecherDropdown() {
-
-    List<String> alleFachnamen = [];
-
-    for (Fach fach in alleFaecher) {
-      alleFachnamen.add(fach.name);
-    }
+  DropdownButton alleFaecherDropdown() {
+    int index = 0;
 
     if (ersteMalLaden) {
-      ausgewaehltesFach = alleFaecher[0];
+      print('laden');
+
+      // finde den index zu zu bearbeitenden faches um es schon vorher auszuwählen
+      for (var i=0; i<alleFaecher.length; i++) {
+        if (alleFaecher[i].id == fach.id) {
+          print('Gefunden');
+          index = i;
+        }
+      }
+
+      ausgewaehltesFach = alleFaecher[index];
     }
     
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border.all(width: 3, color: Color(int.parse(ausgewaehltesFach.farbe))),
-        borderRadius: BorderRadius.circular(30),
-        color: farbeVerdunkeln(Color(int.parse(ausgewaehltesFach.farbe)), 0.2)
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 17, vertical: 11),
-        child: DropdownButton(
-          style: TextStyle(fontSize: 18),
-          isExpanded: true,
-          underline: Container(),
-          value: ausgewaehltesFach,
-          onChanged: (wert) {
-            ersteMalLaden = false;
-            setState(() {
-              ausgewaehltesFach = wert!;
-            });
-          },
-          items: alleFaecher.map((fach) {
-            return DropdownMenuItem(
-              child: Text(fach.name),
-              value: fach,
-            );
-          }).toList(),
-        ),
-      ),
+    return DropdownButton(
+      value: ausgewaehltesFach,
+      onChanged: (wert) {
+        ersteMalLaden = false;
+        setState(() {
+          ausgewaehltesFach = wert;
+        });
+      },
+      items: alleFaecher.map((fach) {
+        return DropdownMenuItem(
+          child: Text(fach.name),
+          value: fach,
+        );
+      }).toList(),
     );
   }
 
+  //Future stundeHinzufeugen() async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Stunde bearbeiten'),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      ),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(20),
-          child: Center (
-            child: Column(
-              children: [
-                SizedBox(height: 20,),
+          child: Center (child: Column(
+            children: [
+              BackButton(),
+              Text(
+                'Stunde bearbeiten',
+                style: Theme.of(context).textTheme.headline2,
+              ),
+              SizedBox(height: 20,),
 
-                // Dropdown fuer Fachauswahl
-                amLaden
-                  ? CircularProgressIndicator()
-                  : alleFaecherDropdown(),
+              // Dropdown fuer Fachauswahl
+              amLaden
+                ? CircularProgressIndicator()
+                : alleFaecherDropdown(),
 
-                SizedBox(height: 30,),
-                
-                TextField(
-                  controller: raumNameController,
-                  style: TextStyle(fontSize: 18),
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
-                    labelText: 'Raum',
-                  ),
+              // Startzeitauswahl
+              OutlinedButton(
+                child: Text(startzeit.hour.toString().padLeft(2, '0') + ':' + startzeit.minute.toString().padLeft(2, '0')),
+                onPressed: () {
+                  startZeitAuswaehlen(context);
+                },
+              ),
+
+              OutlinedButton(
+                child: Text(endzeit.hour.toString().padLeft(2, '0') + ':' + endzeit.minute.toString().padLeft(2, '0')),
+                onPressed: () {
+                  endZeitAuswaehlen(context);
+                },
+              ),
+
+              TextField(
+                controller: raumNameController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Raum',          
                 ),
-                SizedBox(height: 30,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    OutlinedButton(
-                      style: ButtonStyle(
-                        padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 40, vertical: 15)),
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0))),
-                      ),
-                      child: Text(startzeit.hour.toString().padLeft(2, '0') + ':' + startzeit.minute.toString().padLeft(2, '0'), style: TextStyle(fontSize: 18),),
-                      onPressed: () {
-                        startZeitAuswaehlen(context);
-                      },
-                    ),
-                    Icon(Icons.start),
-                    OutlinedButton(
-                      style: ButtonStyle(
-                        padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 40, vertical: 15)),
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0))),
-                      ),
-                      child: Text(endzeit.hour.toString().padLeft(2, '0') + ':' + endzeit.minute.toString().padLeft(2, '0'), style: TextStyle(fontSize: 18),),
-                      onPressed: () {
-                        endZeitAuswaehlen(context);
-                      },
-                    ),
-                  ],
-                ),
-                
-                Spacer(flex: 1,),
-                Container(width: double.infinity, height: 65, child: ElevatedButton(
-                  onPressed: () {
-                    schulstundeHinzufuegen();
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 1,)));
-                  }, 
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.add),
-                      SizedBox(width: 5,),
-                      Text('Stunde hinzufügen')
-                    ],
-                  ),
-                  style: ButtonStyle(
-                    elevation: MaterialStateProperty.all(10),
-                  ),
-                )),
-              ],
+              ),
+
+              FloatingActionButton(
+                onPressed: () {
+                  schulstundeHinzufuegen();
+                  Navigator.push(context, MaterialPageRoute(builder: ((context) => Homescreen(seiteWeiterleiten: 1,))));
+                }, 
+                child:  Icon(Icons.add), 
+                heroTag: 'NeueStundeSeite',
+              ),
+            ],
           ),),
         )
       ),

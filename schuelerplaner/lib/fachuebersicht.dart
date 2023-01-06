@@ -3,6 +3,8 @@ import 'package:schuelerplaner/modelle/stundenplanmodell.dart';
 import 'package:schuelerplaner/db/datenbank.dart';
 import 'package:schuelerplaner/main.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class FachUebersicht extends StatefulWidget {
   const FachUebersicht({super.key});
@@ -51,7 +53,16 @@ class _FachUebersichtState extends State<FachUebersicht> {
               amLaden
               ? CircularProgressIndicator()
               : faecher.isEmpty
-                ? Text('Keine Fächer')
+                ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.sentiment_dissatisfied, size: 80,),
+                      SizedBox(height: 10,),
+                      Text('Noch keine Fächer erstellt', style: TextStyle(fontSize: 17))
+                    ],
+                  ),
+                )
                 : ListView.builder(
                   padding: const EdgeInsets.all(25),
                   itemCount: faecher.length,
@@ -98,10 +109,9 @@ class _NeuesFachSeiteState extends State<NeuesFachSeite> {
         mainAxisSize: MainAxisSize.min,
         children: [
           FarbauswahlWidgetBauen(),
-
-          TextButton(
+          OutlinedButton(
             child: Text(
-              'Auswählen',
+              'Farbe auswählen',
               style: TextStyle(fontSize: 20),
             ),
             onPressed: () {
@@ -132,53 +142,84 @@ class _NeuesFachSeiteState extends State<NeuesFachSeite> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        title: Text('Neues Fach erstellen'),
+      ),
       body: SafeArea(
-        child: Center(
-          child: Column(
-            children: [
-              Text('Neues Fach erstellen'),
-              TextField(
-                controller: fachNameController,
-                decoration: InputDecoration(
-                  label: Text('Name'),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
+          child: Padding(
+            padding: EdgeInsets.all(25),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(height: 20,),
+                TextField(
+                  controller: fachNameController,
+                  decoration: InputDecoration(
+                    label: Text('Name'),
+                    prefixIcon: Icon(Icons.drive_file_rename_outline),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      
+                    ),
                   ),
                 ),
-              ),
-              TextField(
-                controller: fachLehrerController,
-                decoration: InputDecoration(
-                  label: Text('Lehrer'),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
+                SizedBox(height: 25,),
+                TextField(
+                  controller: fachLehrerController,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.person),
+                    label: Text('Lehrer'),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                
-                height: 50,
-                width: 50,
-                decoration: BoxDecoration(
-                  color: fachFarbe,
-                  borderRadius: BorderRadius.circular(100),
-                  border: Border(
-                    left: BorderSide(color: Colors.white),
-                    right: BorderSide(color: Colors.white),
-                    bottom: BorderSide(color: Colors.white),
-                    top: BorderSide(color: Colors.white),
+                SizedBox(height: 25,),
+                InkWell(
+                  onTap: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    farbAuswahlAnzeigen(context);
+                  },
+                  child: Container(
+                    height: 65,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: fachFarbe,
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border(
+                        left: BorderSide(color: Colors.grey),
+                        right: BorderSide(color: Colors.grey),
+                        bottom: BorderSide(color: Colors.grey),
+                        top: BorderSide(color: Colors.grey),
+                      ),
+                    ),
+                    child: Icon(Icons.color_lens),
                   ),
                 ),
-              ),
-              OutlinedButton(
-                onPressed: () {farbAuswahlAnzeigen(context);},
-                child: Icon(Icons.color_lens)
-              ),
-              FloatingActionButton(onPressed: () {fachSpeichern(); Navigator.pop(context);}, child: Icon(Icons.save))
-
-            ],
+                SizedBox(height: 55,),
+                Spacer(flex: 1,),
+                Container(width: double.infinity, height: 65, child: ElevatedButton(
+                  onPressed: () {fachSpeichern(); 
+                  Navigator.pop(context);}, 
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.save),
+                      SizedBox(width: 5,),
+                      Text('Speichern')
+                    ],
+                  ),
+                  style: ButtonStyle(
+                    elevation: MaterialStateProperty.all(10),
+                  ),
+                )),
+                //FloatingActionButton(onPressed: () {fachSpeichern(); Navigator.pop(context);}, child: Icon(Icons.save))
+          
+              ],
+            ),
           ),
-        ),
       ),
     );
   }
@@ -211,17 +252,23 @@ class FachKarte extends StatelessWidget {
           padding: EdgeInsets.only(left: 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                fach.name,
-                style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+              Flexible(
+                child: Text(
+                  fach.name,
+                  style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              Text(
-                fach.lehrer,
-                style: TextStyle(fontSize: 15, color: Color.fromARGB(255, 212, 212, 212)),
+              Flexible(
+                child: Text(
+                  fach.lehrer,
+                  style: TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              Text(fach.id.toString()),
-              IconButton(onPressed: delete, icon: Icon(Icons.delete), color: Color.fromARGB(255, 255, 193, 193),)
+              IconButton(onPressed: delete, icon: Icon(Icons.delete), color: Color.fromARGB(255, 255, 255, 255),)
             ]
           )
         ),
@@ -313,52 +360,85 @@ class _FachBearbeitenSeite extends State<FachBearbeitenSeite> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        title: Text('Fach bearbeiten'),
+      ),
       body: SafeArea(
-        child: Center(
-          child: Column(
-            children: [
-              Text('Neues Fach erstellen'),
-              TextField(
-                controller: fachNameController,
-                decoration: InputDecoration(
-                  label: Text('Name'),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
+          child: Padding(
+            padding: EdgeInsets.all(25),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(height: 20,),
+                TextField(
+                  controller: fachNameController,
+                  decoration: InputDecoration(
+                    label: Text('Name'),
+                    prefixIcon: Icon(Icons.drive_file_rename_outline),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      
+                    ),
                   ),
                 ),
-              ),
-              TextField(
-                controller: fachLehrerController,
-                decoration: InputDecoration(
-                  label: Text('Lehrer'),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
+                SizedBox(height: 25,),
+                TextField(
+                  controller: fachLehrerController,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.person),
+                    label: Text('Lehrer'),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                
-                height: 50,
-                width: 50,
-                decoration: BoxDecoration(
-                  color: fachFarbe,
-                  borderRadius: BorderRadius.circular(100),
-                  border: Border(
-                    left: BorderSide(color: Colors.white),
-                    right: BorderSide(color: Colors.white),
-                    bottom: BorderSide(color: Colors.white),
-                    top: BorderSide(color: Colors.white),
+                SizedBox(height: 25,),
+                InkWell(
+                  onTap: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    farbAuswahlAnzeigen(context);
+                  },
+                  child: Container(
+                    height: 65,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: fachFarbe,
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border(
+                        left: BorderSide(color: Colors.grey),
+                        right: BorderSide(color: Colors.grey),
+                        bottom: BorderSide(color: Colors.grey),
+                        top: BorderSide(color: Colors.grey),
+                      ),
+                    ),
+                    child: Icon(Icons.color_lens),
                   ),
                 ),
-              ),
-              OutlinedButton(
-                onPressed: () {farbAuswahlAnzeigen(context);},
-                child: Icon(Icons.color_lens)
-              ),
-              FloatingActionButton(onPressed: () {fachSpeichern(); Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 2,)));}, child: Icon(Icons.save))
-            ],
+                SizedBox(height: 55,),
+                Spacer(flex: 1,),
+                Container(width: double.infinity, height: 65, child: ElevatedButton(
+                  onPressed: () {fachSpeichern(); 
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 2,)));
+                  }, 
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.save),
+                      SizedBox(width: 5,),
+                      Text('Speichern')
+                    ],
+                  ),
+                  style: ButtonStyle(
+                    elevation: MaterialStateProperty.all(10),
+                  ),
+                )),
+                //FloatingActionButton(onPressed: () {fachSpeichern(); Navigator.pop(context);}, child: Icon(Icons.save))
+          
+              ],
+            ),
           ),
-        ),
       ),
     );
   }
@@ -384,7 +464,7 @@ class _FachDetailsState extends State<FachDetails> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          stops: [0, 0.3, 1],
+          stops: [0.1, 0.4, 1],
           colors: [
             Color(int.parse(widget.fach.farbe)),
             Theme.of(context).scaffoldBackgroundColor,
@@ -393,6 +473,9 @@ class _FachDetailsState extends State<FachDetails> {
         )
       ),
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Color(int.parse(widget.fach.farbe)),
+        ),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.edit),
           onPressed: () {
@@ -406,11 +489,12 @@ class _FachDetailsState extends State<FachDetails> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                AutoSizeText(
                   widget.fach.name,
                   style: TextStyle(fontSize: 40, color: Colors.white, fontWeight: FontWeight.bold),
+                  maxLines: 1,
                 ),
-                SizedBox(height: 150,),
+                SizedBox(height: 180,),
                 Text('Lehrer:', style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
                 Text(widget.fach.lehrer, style: TextStyle(fontSize: 20),),
                 SizedBox(height: 20,)

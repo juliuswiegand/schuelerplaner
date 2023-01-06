@@ -220,6 +220,63 @@ CREATE TABLE $fachTabelle (
     throw Exception('Studen außerhalb des Tagindexes wurden versucht hinzuzufuegen');
   }
 
+  Future<int> stundeLoeschen(int? id, int tagIndex) async {
+    final db = await instance.datenbank;
+
+    if (tagIndex == 0) {
+      return await db.delete(
+        montagTabelle,
+        where: '${SchulstundeFelder.id} = ?',
+        whereArgs: [id],
+      );
+    }
+    if (tagIndex == 1) {
+      return await db.delete(
+        dienstagTabelle,
+        where: '${SchulstundeFelder.id} = ?',
+        whereArgs: [id],
+      );
+    }
+    if (tagIndex == 2) {
+      return await db.delete(
+        mittwochTabelle,
+        where: '${SchulstundeFelder.id} = ?',
+        whereArgs: [id],
+      );
+    }
+    if (tagIndex == 3) {
+      return await db.delete(
+        donnerstagTabelle,
+        where: '${SchulstundeFelder.id} = ?',
+        whereArgs: [id],
+      );
+    }
+    if (tagIndex == 4) {
+      return await db.delete(
+        freitagTabelle,
+        where: '${SchulstundeFelder.id} = ?',
+        whereArgs: [id],
+      );
+    }
+    if (tagIndex == 5) {
+      return await db.delete(
+        samstagTabelle,
+        where: '${SchulstundeFelder.id} = ?',
+        whereArgs: [id],
+      );
+    }
+    if (tagIndex == 6) {
+      return await db.delete(
+        donnerstagTabelle,
+        where: '${SchulstundeFelder.id} = ?',
+        whereArgs: [id],
+      );
+    }
+
+    throw Exception('Studen außerhalb des Tagindexes wurden versucht zu loeschen');
+  }
+  
+
   Future<int> fachLoeschen(int? id) async {
     final db = await instance.datenbank;
 
