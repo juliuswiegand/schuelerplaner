@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:schuelerplaner/stundenplan.dart';
 import 'package:schuelerplaner/fachuebersicht.dart';
+import 'package:timer_builder/timer_builder.dart';
 
 Database? datenbank;
 
@@ -155,6 +156,9 @@ class _DashboardState extends State<Dashboard> {
       return [];
     }
 
+    naechstenStundenKarten.add(Text('Deine nächsten Stunden:', style: TextStyle(fontSize: 19),),);
+    naechstenStundenKarten.add(SizedBox(height: 12,),);
+
     // zeige nur die naechsten 3 stunden
     for (var i = 0; i < naechstenStunden.length; i++) {
       if (i <= 2) {
@@ -182,43 +186,65 @@ class _DashboardState extends State<Dashboard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [ 
-              Container(
-                child: Align(
-                  alignment: Alignment.topRight,
-                  child: IconButton(
-                    iconSize: 30,
-                    style: ButtonStyle(
-                      side: MaterialStatePropertyAll(
-                        BorderSide(
-                          color: Colors.white.withAlpha(50),
-                        ),
-                      )
-                    ),
-                    icon: Icon(Icons.settings),
-                    onPressed: () {
-                      print('Pressed');
-                    },
-                  ),
-                ),
-              ),
+              // SETTINGS BUTTON
+              //Container(
+              //  child: Align(
+              //    alignment: Alignment.topRight,
+              //    child: IconButton(
+              //      iconSize: 30,
+              //      style: ButtonStyle(
+              //        side: MaterialStatePropertyAll(
+              //          BorderSide(
+              //            color: Colors.white.withAlpha(50),
+              //          ),
+              //        )
+              //      ),
+              //      icon: Icon(Icons.settings),
+              //      onPressed: () {
+              //        print('Pressed');
+              //      },
+              //    ),
+              //  ),
+              //),
+
               Text(begruessung(), style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),),
 
               SizedBox(height: 40,),
 
-              Text('Deine nächsten Stunden:', style: TextStyle(fontSize: 19),),
-              SizedBox(height: 12,),
               
-              FutureBuilder(
-                future: bekommeNaechstenStunden(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Column(
-                      children: snapshot.data!,
-                    );
-                  } else {
-                    return Text('Lädt...');
-                  }
-                })           
+              
+              TimerBuilder.periodic(
+                Duration(minutes: 1),
+                builder: (context) {
+                  return FutureBuilder(
+                    future: bekommeNaechstenStunden(),
+                    builder: (context, snapshot) {
+                      print(snapshot.data);
+                      if (snapshot.hasData) {
+                        if (snapshot.data!.length != 0) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: snapshot.data!,
+                          );
+                        } else {
+                          return Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(height: 0,),
+                                Icon(Icons.check, color: Colors.white.withAlpha(100), size: 50,),
+                                Text('Heute hast du keine Stunden mehr', style: TextStyle(color: Colors.white.withAlpha(150), fontSize: 15),)
+                              ],
+                            ),
+                          );
+                        }
+                      } else {
+                        return Text('Lädt...');
+                      }
+                    }
+                  );
+                },           
+              )           
             ]
           ),
         ),
