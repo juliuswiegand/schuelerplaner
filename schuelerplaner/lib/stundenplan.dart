@@ -32,8 +32,9 @@ class _StundenplanSeiteState extends State<StundenplanSeite> {
 
     ausgewaehlterTagIndex = aktuellerTagIndex;
 
-    tagAktualisert(aktuellerTagIndex);
     setzeAlleFaecher();
+    tagAktualisert(aktuellerTagIndex);
+    
   }
 
   Future tagAktualisert(int tag) async {
@@ -163,7 +164,6 @@ class _StundenplanSeiteState extends State<StundenplanSeite> {
                                 );
                               } else {
                                 Fach tempFach = Fach(lehrer: 'Lädt', name: 'Lädt', farbe: '4286279837');
-                              
                                 return StundenplanKarte(fach: tempFach, tag: ausgewaehlterTagIndex, schulstunde: stunde,);
                               }
                             },
@@ -758,15 +758,10 @@ class _StundeBearbeitenSeite extends State<StundeBearbeitenSeite> {
   }
 
   DecoratedBox alleFaecherDropdown() {
-
-    List<String> alleFachnamen = [];
-
-    for (Fach fach in alleFaecher) {
-      alleFachnamen.add(fach.name);
-    }
-
-    if (ersteMalLaden) {
-      ausgewaehltesFach = alleFaecher[0];
+    for (var i = 0; i < alleFaecher.length; i++) {
+      if (alleFaecher[i].id == schulstunde.fachid && ersteMalLaden) {
+        ausgewaehltesFach = alleFaecher[i];
+      }
     }
     
     return DecoratedBox(

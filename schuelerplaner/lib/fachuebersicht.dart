@@ -234,7 +234,54 @@ class FachKarte extends StatelessWidget {
   Future delete() async {
     print('Lösche Eintrag');
     await Datenbank.instance.fachLoeschen(fach.id);
+    ueberpruefeAufStundenOhneFach();
+    ueberpruefeAufHausaufgabenOhneFach();
     listeAktualisieren();
+  }
+
+  Future ueberpruefeAufStundenOhneFach() async {
+    List<Fach> alleFaecher = await Datenbank.instance.alleFaecherAuslesen();
+
+    for (int tag = 0; tag < 7; tag++) {
+      List<Schulstunde> stundenplan = await Datenbank.instance.alleStundenAuslesen(tag);
+
+      for (var i = 0; i < stundenplan.length; i++) {
+        
+        int stundeFachId = stundenplan[i].fachid;
+        bool gefunden = false;
+
+        alleFaecher.forEach((element) {
+          if (element.id == stundeFachId) {
+            gefunden = true;
+          }
+        });
+
+        if (!gefunden) {
+          await Datenbank.instance.stundeLoeschen(stundenplan[i].id, tag);
+        }
+      }
+    }
+  }
+
+  Future ueberpruefeAufHausaufgabenOhneFach() async {
+    List<Fach> alleFaecher = await Datenbank.instance.alleFaecherAuslesen();
+    List<Hausaufgabe> alleHausaufgaben = await Datenbank.instance.alleHausaufgabenAuslesen();
+
+    for (var i = 0; i < alleHausaufgaben.length; i++) {
+      
+      int hausaufgabeFachId = alleHausaufgaben[i].fachid;
+      bool gefunden = false;
+
+      alleFaecher.forEach((element) {
+        if (element.id == hausaufgabeFachId) {
+          gefunden = true;
+        }
+      });
+
+      if (!gefunden) {
+        await Datenbank.instance.hausaufgabeLoeschen(alleHausaufgaben[i].id);
+      }
+    }
   }
 
   final Fach fach;

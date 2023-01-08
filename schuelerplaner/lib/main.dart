@@ -12,6 +12,8 @@ import 'package:schuelerplaner/stundenplan.dart';
 import 'package:schuelerplaner/fachuebersicht.dart';
 import 'package:timer_builder/timer_builder.dart';
 import 'package:schuelerplaner/hausaufgabenuebersicht.dart';
+import 'package:schuelerplaner/hausaufgabenuebersicht.dart';
+import 'package:dotted_border/dotted_border.dart';
 
 Database? datenbank;
 
@@ -122,11 +124,14 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   String begruessung() {
     var hour = DateTime.now().hour;
-    if (hour < 12) {
+    if (hour < 12 && hour > 4) {
       return 'Guten Morgen,';
     }
-    if (hour < 17) {
+    if (hour < 17 && hour > 4) {
       return 'Guten Tag,';
+    }
+    if (hour < 4 || hour == 23) {
+      return 'Gute Nacht,';
     }
     return 'Guten Abend,';
   }
@@ -180,6 +185,22 @@ class _DashboardState extends State<Dashboard> {
     return naechstenStundenKarten;
   }
 
+  Future<List<Widget>> bekommeHausaufgabenBisMorgen() async {
+    List<Widget> hausaufgabenBisMorgen = [];
+    DateTime morgen = DateTime.now().add(Duration(days: 1));
+    List<Hausaufgabe> alleHausaufgaben = await Datenbank.instance.alleNichtErledigtenHausaufgabenAuslesen();
+
+    alleHausaufgaben.forEach((element) {
+      if (element.abgabeZeitpunkt.month == morgen.month && element.abgabeZeitpunkt.day == morgen.day) {
+        hausaufgabenBisMorgen.add(HausaufgabeKarteDashboard(hausaufgabe: element));
+        hausaufgabenBisMorgen.add(SizedBox(height: 15,));
+      }
+    });
+
+    print(hausaufgabenBisMorgen);
+    return hausaufgabenBisMorgen;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -231,7 +252,6 @@ class _DashboardState extends State<Dashboard> {
                       return FutureBuilder(
                         future: bekommeNaechstenStunden(),
                         builder: (context, snapshot) {
-                          print(snapshot.data);
                           if (snapshot.hasData) {
                             if (snapshot.data!.length != 0) {
                               return Column(
@@ -258,7 +278,51 @@ class _DashboardState extends State<Dashboard> {
                     },           
                   ),
                 ),
-              )           
+              ),
+
+              SizedBox(height: 35,),
+              Text('Hausaufgaben für morgen:', style: TextStyle(fontSize: 19),),
+              SizedBox(height: 12,),
+
+              FutureBuilder(
+                future: bekommeHausaufgabenBisMorgen(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    if (snapshot.data!.length != 0) {
+                      return Expanded(
+                        child: ListView(
+                          //crossAxisAlignment: CrossAxisAlignment.start,
+                          shrinkWrap: true,
+                          children: snapshot.data!,
+                        ),
+                      );
+                    } else {
+                      return Center(
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Theme.of(context).dividerColor, width: 2),             
+                            borderRadius: BorderRadius.circular(30)
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(height: 0,),
+                                Icon(Icons.celebration_outlined, color: Colors.white.withAlpha(100), size: 50,),
+                                Text('Keine Hausaufgaben bis morgen', style: TextStyle(color: Colors.white.withAlpha(150), fontSize: 15),)
+                              ],
+                            ),
+                          ),
+                        )
+                      );
+                    }
+                  } else {
+                    return Text('Lädt...');
+                  }
+                }
+              )
             ]
           ),
         ),
@@ -354,6 +418,178 @@ class naechsteStundeKarte extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class HausaufgabeKarteDashboard extends StatefulWidget {
+  const HausaufgabeKarteDashboard({
+    super.key,
+    required this.hausaufgabe,
+  });
+
+  final Hausaufgabe hausaufgabe;
+
+  @override
+  State<HausaufgabeKarteDashboard> createState() => _HausaufgabeKarteDashboardState();
+}
+
+class _HausaufgabeKarteDashboardState extends State<HausaufgabeKarteDashboard> {
+  Fach? fach = Fach(lehrer: 'Lädt...', name: 'Lädt...', farbe: '4286279837');
+
+  @override
+  void initState() {
+    bekommeFach();
+    super.initState();
+  }
+
+  static const wochentage = [
+    'Montag',
+    'Dienstag',
+    'Mittwoch',
+    'Donnerstag',
+    'Freitag',
+    'Samstag',
+    'Sonntag'
+  ];
+
+  Future<void> bekommeFach() async {
+    fach = await Datenbank.instance.fachAuslesen(widget.hausaufgabe.fachid);
+
+    if (fach == null) {
+      fach = Fach(lehrer: 'Lädt...', name: 'Lädt...', farbe: '4286279837');
+    }
+    setState(() {});
+  }
+
+  String zeitDifferenzInTagen(DateTime vergleichsDatum) {
+    Duration difference = DateTime.now().difference(vergleichsDatum);
+
+    if (difference.inHours.abs() < 24) {
+      return 'Morgen';
+    }
+
+    if (difference.inDays.abs() == 1) {
+       return '2 Tage';
+    }
+    return difference.inDays.abs().toString() + ' Tage';
+  }
+
+  Future<void> alsErledigtMarkieren() async {
+    Hausaufgabe hausaufgabe = Hausaufgabe(
+      id: widget.hausaufgabe.id,
+      fachid: widget.hausaufgabe.fachid,
+      erstellungsZeitpunkt: widget.hausaufgabe.erstellungsZeitpunkt,
+      abgabeZeitpunkt: widget.hausaufgabe.abgabeZeitpunkt,
+      aufgabe: widget.hausaufgabe.aufgabe,
+      erledigt: true,
+    );
+    await Datenbank.instance.hausaufgabeAktualisieren(hausaufgabe);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(30),
+      onTap: (() {
+        Navigator.push(context, MaterialPageRoute(builder: ((context) => HausaufgabeBearbeiten(hausaufgabe: widget.hausaufgabe))));
+      }),
+      child: DottedBorder(
+        strokeWidth: 2,
+        borderType: BorderType.RRect,
+        color: Theme.of(context).dividerColor,
+        radius: Radius.circular(30),
+        dashPattern: [15, 5],
+        padding: EdgeInsets.all(13),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.library_add, size: 18, color: Theme.of(context).dividerColor.withAlpha(100),),
+                    SizedBox(width: 3,),
+                    Text(
+                      widget.hausaufgabe.erstellungsZeitpunkt.day.toString().padLeft(2, '0') + '.' + widget.hausaufgabe.erstellungsZeitpunkt.month.toString().padLeft(2, '0') + '.' + widget.hausaufgabe.erstellungsZeitpunkt.year.toString(),
+                      style: TextStyle(color: Theme.of(context).dividerColor.withAlpha(100)),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 9, vertical: 2),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white, width: 1.5),
+                    color: Color(int.parse(fach!.farbe)),
+                    borderRadius: BorderRadius.circular(30)
+                  ),
+                  child: Text(
+                    fach!.name,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            // fach marker
+            
+            SizedBox(height: 15,),
+    
+            Container(
+              width: double.infinity,
+              child: Text(
+                widget.hausaufgabe.aufgabe,
+                style: TextStyle(fontSize: 17),
+              ),
+            ),
+    
+            SizedBox(height: 15,),
+    
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Icon(Icons.label_important, size: 22,),
+                SizedBox(width: 8,),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 17, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).dividerColor,
+                    border: Border.all(color: Colors.white),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Text(
+                    wochentage[widget.hausaufgabe.abgabeZeitpunkt.weekday - 1] + ' | ' + widget.hausaufgabe.abgabeZeitpunkt.day.toString().padLeft(2, '0') + '.' + widget.hausaufgabe.abgabeZeitpunkt.month.toString().padLeft(2, '0'),
+                    style: TextStyle(fontSize: 15),
+                  ),
+                ),
+              ] 
+            ),
+            SizedBox(height: 20,),
+            Container(width: double.infinity, height: 40, 
+              child: ElevatedButton(
+                style: ButtonStyle(
+                  elevation: MaterialStateProperty.all(5),
+                ),
+                onPressed: () {
+                  alsErledigtMarkieren();
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 0,)));
+                }, 
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.check),
+                    SizedBox(width: 5,),
+                    Text('Erledigt')
+                  ],
+                ),
+              )
+            ),
+          ],
+        ),
       ),
     );
   }

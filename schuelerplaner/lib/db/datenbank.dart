@@ -368,20 +368,33 @@ class Datenbank {
 
   Future<List<Hausaufgabe>> alleNichtErledigtenHausaufgabenAuslesen() async {
     final db = await instance.datenbank;
+    final sortierenNach = '${HausaufgabeFelder.abgabeZeitpunkt} ASC';
+
     final ergebniss = await db.query(
       hausaufgabenTabelle, 
       where: '${HausaufgabeFelder.erledigt} = ?',
       whereArgs: [0],
+      orderBy: sortierenNach,
     );
     return ergebniss.map((json) => Hausaufgabe.vonJson(json)).toList();
   }
 
   Future<List<Hausaufgabe>> alleErledigtenHausaufgabenAuslesen() async {
     final db = await instance.datenbank;
+    final sortierenNach = '${HausaufgabeFelder.erstellungsZeitpunkt} ASC';
+
     final ergebniss = await db.query(
       hausaufgabenTabelle, 
       where: '${HausaufgabeFelder.erledigt} = ?',
       whereArgs: [1],
+    );
+    return ergebniss.map((json) => Hausaufgabe.vonJson(json)).toList();
+  }
+
+  Future<List<Hausaufgabe>> alleHausaufgabenAuslesen() async {
+    final db = await instance.datenbank;
+    final ergebniss = await db.query(
+      hausaufgabenTabelle, 
     );
     return ergebniss.map((json) => Hausaufgabe.vonJson(json)).toList();
   }
