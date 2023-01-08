@@ -106,9 +106,9 @@ class _HausaufgabenSeiteState extends State<HausaufgabenSeite> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.sentiment_very_satisfied, size: 80,),
+                  Icon(Icons.sentiment_very_satisfied, size: 80, color: Theme.of(context).dividerColor.withAlpha(130),),
                   SizedBox(height: 10,),
-                  Text('Keine Hausaufgaben'),
+                  Text('Keine Hausaufgaben', style: TextStyle(color: Theme.of(context).dividerColor.withAlpha(160),),),
                 ],
               ),
             )
@@ -169,9 +169,9 @@ class _HausaufgabenArchivState extends State<HausaufgabenArchiv> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.dangerous_outlined, size: 80,),
+                  Icon(Icons.dangerous_outlined, size: 80, color: Theme.of(context).dividerColor.withAlpha(130),),
                   SizedBox(height: 10,),
-                  Text('Hier ist es leer'),
+                  Text('Hier ist es leer', style: TextStyle(color: Theme.of(context).dividerColor.withAlpha(160),),),
                 ],
               ),
             )

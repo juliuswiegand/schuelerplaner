@@ -140,9 +140,9 @@ class _StundenplanSeiteState extends State<StundenplanSeite> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.error_outline, size: 80,),
+                            Icon(Icons.error_outline, size: 80, color: Theme.of(context).dividerColor.withAlpha(130),),
                             SizedBox(height: 10,),
-                            Text('Noch keine Stunden hinzugefügt', style: TextStyle(fontSize: 17),)
+                            Text('Noch keine Stunden hinzugefügt', style: TextStyle(fontSize: 17, color: Theme.of(context).dividerColor.withAlpha(160),),)
                           ],
                         ),
                       )
@@ -199,7 +199,6 @@ class StundenDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     double berechneZeitFortschritt() {
       DateTime startzeit = schulstunde.startzeit;
       DateTime endzeit = schulstunde.endzeit;
@@ -419,7 +418,7 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
   void startZeitAuswaehlen(context) async {
     startzeit = (await showTimePicker(context: context, initialTime: TimeOfDay.now()))!;
     DateTime startzeitDateTime = DateTime(2000, 1, 1, startzeit.hour, startzeit.minute);
-    DateTime vorschlagEndZeitDateTime = startzeitDateTime.add(Duration(minutes: 45));
+    DateTime vorschlagEndZeitDateTime = startzeitDateTime.add(Duration(minutes: 60));
 
     // setze endzeit automatisch auf +45min um typische stundenlaenge vorzuschlagen
     endzeit = TimeOfDay(hour: vorschlagEndZeitDateTime.hour, minute: vorschlagEndZeitDateTime.minute);
@@ -431,6 +430,14 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
   void endZeitAuswaehlen(context) async {
     endzeit = (await showTimePicker(context: context, initialTime: TimeOfDay.now()))!;
     setState(() {});
+  }
+
+  String gibZeitUnterschied() {
+    DateTime startzeitDateTime = DateTime(2000, 1, 1, startzeit.hour, startzeit.minute);
+    DateTime endzeitDateTime = DateTime(2000, 1, 1, endzeit.hour, endzeit.minute);
+
+    Duration differenz = startzeitDateTime.difference(endzeitDateTime);
+    return differenz.inMinutes.abs().toString();
   }
 
   Future alleFaecherAuslesen() async {
@@ -528,7 +535,15 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
                         startZeitAuswaehlen(context);
                       },
                     ),
-                    Icon(Icons.start),
+
+                    Column(
+                      children: [
+                        Icon(Icons.arrow_forward, color: Theme.of(context).dividerColor.withAlpha(150),),
+                        Text(gibZeitUnterschied() + ' Minuten', style: TextStyle(color: Theme.of(context).dividerColor.withAlpha(150)),),
+                      ],
+                    ),
+                    
+
                     OutlinedButton(
                       style: ButtonStyle(
                         padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 40, vertical: 15)),
@@ -610,6 +625,9 @@ class _StundenplanKarteState extends State<StundenplanKarte> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
       elevation: 10,
       child: InkWell(
         onTap: () {
@@ -795,6 +813,14 @@ class _StundeBearbeitenSeite extends State<StundeBearbeitenSeite> {
     );
   }
 
+  String gibZeitUnterschied() {
+    DateTime startzeitDateTime = DateTime(2000, 1, 1, startzeit.hour, startzeit.minute);
+    DateTime endzeitDateTime = DateTime(2000, 1, 1, endzeit.hour, endzeit.minute);
+
+    Duration differenz = startzeitDateTime.difference(endzeitDateTime);
+    return differenz.inMinutes.abs().toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -839,7 +865,14 @@ class _StundeBearbeitenSeite extends State<StundeBearbeitenSeite> {
                         startZeitAuswaehlen(context);
                       },
                     ),
-                    Icon(Icons.start),
+                    
+                    Column(
+                      children: [
+                        Icon(Icons.arrow_forward, color: Theme.of(context).dividerColor.withAlpha(150),),
+                        Text(gibZeitUnterschied() + ' Minuten', style: TextStyle(color: Theme.of(context).dividerColor.withAlpha(150)),),
+                      ],
+                    ),
+
                     OutlinedButton(
                       style: ButtonStyle(
                         padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 40, vertical: 15)),

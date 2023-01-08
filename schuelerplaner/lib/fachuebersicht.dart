@@ -56,9 +56,9 @@ class _FachUebersichtState extends State<FachUebersicht> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.sentiment_dissatisfied, size: 80,),
+                      Icon(Icons.sentiment_dissatisfied, size: 80, color: Theme.of(context).dividerColor.withAlpha(160),),
                       SizedBox(height: 10,),
-                      Text('Noch keine Fächer erstellt', style: TextStyle(fontSize: 17))
+                      Text('Noch keine Fächer erstellt', style: TextStyle(fontSize: 17, color: Theme.of(context).dividerColor.withAlpha(180),),)
                     ],
                   ),
                 )

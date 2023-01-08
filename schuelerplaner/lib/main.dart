@@ -3,7 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:schuelerplaner/db/datenbank.dart';
+import 'package:schuelerplaner/einstellungen.dart';
 import 'package:schuelerplaner/modelle/datenbankmodell.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -41,7 +43,29 @@ class _HomescreenState extends State<Homescreen> {
       print('Direkt weiterleiten');
       currentPageIndex = widget.seiteWeiterleiten!;
     }
+    erstesMalReset();
+    ladeStandardWerte();
     super.initState();
+  }
+
+  void ladeStandardWerte() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? erstesMal = prefs.getBool('erstesMal');
+    if (erstesMal != null && !erstesMal) {
+      print('Nicht das erste mal App geoeffnet');
+    } else {
+      print('Erstes mal App geoeffnet');
+      prefs.setBool('erstesMal', false);
+
+      // setze standard werte
+      prefs.setInt('farbThema', 3); // system
+      prefs.setInt('stundenlaenge', 45);
+    }
+  }
+
+  void erstesMalReset() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('erstesMal', true);
   }
 
   Widget build(BuildContext context) {
@@ -66,6 +90,7 @@ class _HomescreenState extends State<Homescreen> {
         theme: ThemeData(
           useMaterial3: true,
           colorScheme: lightColorScheme,
+          fontFamily: 'Poppins',
           textTheme: TextTheme(
             labelMedium: TextStyle(color: Colors.white, fontSize: 18),
           ),
@@ -79,6 +104,8 @@ class _HomescreenState extends State<Homescreen> {
         darkTheme: ThemeData(
           useMaterial3: true,
           colorScheme: darkColorScheme,
+          scaffoldBackgroundColor: Colors.black,
+          fontFamily: 'Poppins',
           textTheme: TextTheme(
             labelMedium: TextStyle(color: Colors.white, fontSize: 18),
           ),
@@ -122,12 +149,17 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   String begruessung() {
     var hour = DateTime.now().hour;
     if (hour < 12 && hour > 4) {
       return 'Guten Morgen,';
     }
-    if (hour < 17 && hour > 4) {
+    if (hour < 18 && hour > 4) {
       return 'Guten Tag,';
     }
     if (hour < 4 || hour == 23) {
@@ -211,30 +243,37 @@ class _DashboardState extends State<Dashboard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [ 
-              // SETTINGS BUTTON
-              //Container(
-              //  child: Align(
-              //    alignment: Alignment.topRight,
-              //    child: IconButton(
-              //      iconSize: 30,
-              //      style: ButtonStyle(
-              //        side: MaterialStatePropertyAll(
-              //          BorderSide(
-              //            color: Colors.white.withAlpha(50),
-              //          ),
-              //        )
-              //      ),
-              //      icon: Icon(Icons.settings),
-              //      onPressed: () {
-              //        print('Pressed');
-              //      },
-              //    ),
-              //  ),
-              //),
+              
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(begruessung(), style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),),
+                  Container(
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: IconButton(
+                        iconSize: 30,
+                        style: ButtonStyle(
+                          side: MaterialStatePropertyAll(
+                            BorderSide(
+                              color: Colors.white.withAlpha(50),
+                            ),
+                          )
+                        ),
+                        icon: Icon(Icons.settings),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => EinstellungenSeite()));
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
 
-              Text(begruessung(), style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),),
-
-              SizedBox(height: 40,),
+              SizedBox(height: 10,),
+              Divider(thickness: 2,),
+              SizedBox(height: 30,),
+              
 
               Text('Deine nächsten Stunden:', style: TextStyle(fontSize: 19),),
               SizedBox(height: 12,),
@@ -264,8 +303,8 @@ class _DashboardState extends State<Dashboard> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     SizedBox(height: 0,),
-                                    Icon(Icons.check, color: Colors.white.withAlpha(100), size: 50,),
-                                    Text('Heute hast du keine Stunden mehr', style: TextStyle(color: Colors.white.withAlpha(150), fontSize: 15),)
+                                    Icon(Icons.check, color: Theme.of(context).dividerColor.withAlpha(100), size: 50,),
+                                    Text('Heute hast du keine Stunden mehr', style: TextStyle(color: Theme.of(context).dividerColor.withAlpha(150), fontSize: 15),)
                                   ],
                                 ),
                               );
@@ -310,8 +349,8 @@ class _DashboardState extends State<Dashboard> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 SizedBox(height: 0,),
-                                Icon(Icons.celebration_outlined, color: Colors.white.withAlpha(100), size: 50,),
-                                Text('Keine Hausaufgaben bis morgen', style: TextStyle(color: Colors.white.withAlpha(150), fontSize: 15),)
+                                Icon(Icons.celebration_outlined, color: Theme.of(context).dividerColor.withAlpha(100), size: 50,),
+                                Text('Keine Hausaufgaben bis morgen', style: TextStyle(color: Theme.of(context).dividerColor.withAlpha(150), fontSize: 15),)
                               ],
                             ),
                           ),
