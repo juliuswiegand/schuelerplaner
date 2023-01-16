@@ -17,11 +17,61 @@ import 'package:schuelerplaner/hausaufgabenuebersicht.dart';
 import 'package:schuelerplaner/hausaufgabenuebersicht.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:introduction_screen/introduction_screen.dart';
 
 Database? datenbank;
 
 void main() {
-  runApp(Homescreen());
+  runApp(WillkommenScreen());
+}
+
+class WillkommenScreen extends StatefulWidget {
+  const WillkommenScreen({super.key});
+
+  @override
+  State<WillkommenScreen> createState() => _WillkommenScreenState();
+}
+
+class _WillkommenScreenState extends State<WillkommenScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData(
+        brightness: Brightness.light,
+        fontFamily: 'Poppins',
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        fontFamily: 'Poppins',
+      ),
+      themeMode: ThemeMode.system,
+
+      home: Scaffold(
+        body: SafeArea(
+          child: IntroductionScreen(
+            pages: [
+              PageViewModel(
+                title: 'Willkommen',
+                image: Image(image: AssetImage('images/bildung.png')),
+                body: 'Mit dieser App kannst du deinen Stundenplan und deine Hausaufgaben managen'
+              ),
+              PageViewModel(
+                title: 'Hallo2',
+                body: 'text'
+              ),
+            ],
+            next: Icon(Icons.arrow_forward),
+            back: Icon(Icons.arrow_back),
+            showBackButton: true,
+            done: Text('Fertig'),
+            onDone: () {
+              print('Fertig');
+            },
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class Homescreen extends StatefulWidget {
