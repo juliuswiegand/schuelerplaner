@@ -6,6 +6,7 @@ import 'package:timer_builder/timer_builder.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:schuelerplaner/farbManipulation.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StundenplanSeite extends StatefulWidget {
   const StundenplanSeite({
@@ -384,6 +385,7 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
   bool amLaden = false;
   bool ersteMalLaden = true;
   int ausgewaelterTagIndex = 0;
+  int standardStundenLaenge = 45;
 
   TextEditingController raumNameController = TextEditingController();
 
@@ -397,7 +399,13 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
   void initState() {
     super.initState();
 
+    bekommeBenutzerStundenLaenge();
     alleFaecherAuslesen();
+  }
+
+  Future<void> bekommeBenutzerStundenLaenge() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    standardStundenLaenge = prefs.getInt('stundenLaenge') ?? 45;
   }
 
   Future<void> schulstundeHinzufuegen() async {
@@ -418,7 +426,7 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
   void startZeitAuswaehlen(context) async {
     startzeit = (await showTimePicker(context: context, initialTime: TimeOfDay.now()))!;
     DateTime startzeitDateTime = DateTime(2000, 1, 1, startzeit.hour, startzeit.minute);
-    DateTime vorschlagEndZeitDateTime = startzeitDateTime.add(Duration(minutes: 60));
+    DateTime vorschlagEndZeitDateTime = startzeitDateTime.add(Duration(minutes: standardStundenLaenge));
 
     // setze endzeit automatisch auf +45min um typische stundenlaenge vorzuschlagen
     endzeit = TimeOfDay(hour: vorschlagEndZeitDateTime.hour, minute: vorschlagEndZeitDateTime.minute);
@@ -444,7 +452,6 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
     setState(() => amLaden = true);
     this.alleFaecher = await Datenbank.instance.alleFaecherAuslesen(); 
     setState(() => amLaden = false);
-    
   }
 
   DecoratedBox alleFaecherDropdown() {

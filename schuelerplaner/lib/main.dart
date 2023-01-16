@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:schuelerplaner/db/datenbank.dart';
 import 'package:schuelerplaner/einstellungen.dart';
+import 'package:schuelerplaner/farbManipulation.dart';
 import 'package:schuelerplaner/modelle/datenbankmodell.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,6 +16,7 @@ import 'package:timer_builder/timer_builder.dart';
 import 'package:schuelerplaner/hausaufgabenuebersicht.dart';
 import 'package:schuelerplaner/hausaufgabenuebersicht.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Database? datenbank;
 
@@ -43,29 +44,7 @@ class _HomescreenState extends State<Homescreen> {
       print('Direkt weiterleiten');
       currentPageIndex = widget.seiteWeiterleiten!;
     }
-    erstesMalReset();
-    ladeStandardWerte();
     super.initState();
-  }
-
-  void ladeStandardWerte() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool? erstesMal = prefs.getBool('erstesMal');
-    if (erstesMal != null && !erstesMal) {
-      print('Nicht das erste mal App geoeffnet');
-    } else {
-      print('Erstes mal App geoeffnet');
-      prefs.setBool('erstesMal', false);
-
-      // setze standard werte
-      prefs.setInt('farbThema', 3); // system
-      prefs.setInt('stundenlaenge', 45);
-    }
-  }
-
-  void erstesMalReset() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('erstesMal', true);
   }
 
   Widget build(BuildContext context) {
@@ -104,7 +83,7 @@ class _HomescreenState extends State<Homescreen> {
         darkTheme: ThemeData(
           useMaterial3: true,
           colorScheme: darkColorScheme,
-          scaffoldBackgroundColor: Colors.black,
+          //scaffoldBackgroundColor: Colors.black,
           fontFamily: 'Poppins',
           textTheme: TextTheme(
             labelMedium: TextStyle(color: Colors.white, fontSize: 18),
@@ -149,9 +128,18 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  String benutzerName = 'Benutzer';
+
   @override
   void initState() {
+    benutzerNameLaden();
     super.initState();
+  }
+
+  void benutzerNameLaden() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    benutzerName = prefs.getString('benutzername') ?? 'Benutzer';
+    setState(() {});
   }
 
   String begruessung() {
@@ -242,13 +230,13 @@ class _DashboardState extends State<Dashboard> {
           padding: EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [ 
-              
+            children: [           
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(begruessung(), style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold),),
+                  Text(begruessung(), style: TextStyle(fontSize: 30),),
                   Container(
+                    //height: 50,
                     child: Align(
                       alignment: Alignment.topRight,
                       child: IconButton(
@@ -262,7 +250,7 @@ class _DashboardState extends State<Dashboard> {
                         ),
                         icon: Icon(Icons.settings),
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => EinstellungenSeite()));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => EinstellungenSeite())).then((value) => benutzerNameLaden());
                         },
                       ),
                     ),
@@ -270,98 +258,110 @@ class _DashboardState extends State<Dashboard> {
                 ],
               ),
 
+              GradientText(
+                benutzerName, 
+                style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold, height: 1),
+                colors: [standardFarbe, farbeVerdunkeln(standardFarbe, 0.1)],
+              ),
+
               SizedBox(height: 10,),
               Divider(thickness: 2,),
               SizedBox(height: 30,),
               
+              Expanded(
+                child: ListView(
+                  children: [
+                    Text('Deine nächsten Stunden:', style: TextStyle(fontSize: 19),),
+                    SizedBox(height: 12,),
 
-              Text('Deine nächsten Stunden:', style: TextStyle(fontSize: 19),),
-              SizedBox(height: 12,),
-
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).dividerColor, width: 2),             
-                  borderRadius: BorderRadius.circular(30)
-                ),
-                child: Padding(
-                  padding: EdgeInsets.only(top: 15, bottom: 10, left: 15, right: 15),
-                  child: TimerBuilder.periodic(
-                    Duration(minutes: 1),
-                    builder: (context) {
-                      return FutureBuilder(
-                        future: bekommeNaechstenStunden(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            if (snapshot.data!.length != 0) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: snapshot.data!,
-                              );
-                            } else {
-                              return Center(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(height: 0,),
-                                    Icon(Icons.check, color: Theme.of(context).dividerColor.withAlpha(100), size: 50,),
-                                    Text('Heute hast du keine Stunden mehr', style: TextStyle(color: Theme.of(context).dividerColor.withAlpha(150), fontSize: 15),)
-                                  ],
-                                ),
-                              );
-                            }
-                          } else {
-                            return Text('Lädt...');
-                          }
-                        }
-                      );
-                    },           
-                  ),
-                ),
-              ),
-
-              SizedBox(height: 35,),
-              Text('Hausaufgaben für morgen:', style: TextStyle(fontSize: 19),),
-              SizedBox(height: 12,),
-
-              FutureBuilder(
-                future: bekommeHausaufgabenBisMorgen(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    if (snapshot.data!.length != 0) {
-                      return Expanded(
-                        child: ListView(
-                          //crossAxisAlignment: CrossAxisAlignment.start,
-                          shrinkWrap: true,
-                          children: snapshot.data!,
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Theme.of(context).dividerColor, width: 2),             
+                        borderRadius: BorderRadius.circular(30)
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 15, bottom: 10, left: 15, right: 15),
+                        child: TimerBuilder.periodic(
+                          Duration(minutes: 1),
+                          builder: (context) {
+                            return FutureBuilder(
+                              future: bekommeNaechstenStunden(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  if (snapshot.data!.length != 0) {
+                                    return Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: snapshot.data!,
+                                    );
+                                  } else {
+                                    return Center(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          SizedBox(height: 0,),
+                                          Icon(Icons.check, color: Theme.of(context).dividerColor.withAlpha(100), size: 50,),
+                                          Text('Heute hast du keine Stunden mehr', style: TextStyle(color: Theme.of(context).dividerColor.withAlpha(150), fontSize: 15),)
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                } else {
+                                  return Text('Lädt...');
+                                }
+                              }
+                            );
+                          },           
                         ),
-                      );
-                    } else {
-                      return Center(
-                        child: Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Theme.of(context).dividerColor, width: 2),             
-                            borderRadius: BorderRadius.circular(30)
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SizedBox(height: 0,),
-                                Icon(Icons.celebration_outlined, color: Theme.of(context).dividerColor.withAlpha(100), size: 50,),
-                                Text('Keine Hausaufgaben bis morgen', style: TextStyle(color: Theme.of(context).dividerColor.withAlpha(150), fontSize: 15),)
-                              ],
-                            ),
-                          ),
-                        )
-                      );
-                    }
-                  } else {
-                    return Text('Lädt...');
-                  }
-                }
-              )
+                      ),
+                    ),
+
+                    SizedBox(height: 35,),
+                    Text('Hausaufgaben für morgen:', style: TextStyle(fontSize: 19),),
+                    SizedBox(height: 12,),
+
+                    FutureBuilder(
+                      future: bekommeHausaufgabenBisMorgen(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          if (snapshot.data!.length != 0) {
+                            return Expanded(
+                              child: ListView(
+                                //crossAxisAlignment: CrossAxisAlignment.start,
+                                shrinkWrap: true,
+                                physics: ClampingScrollPhysics(),
+                                children: snapshot.data!,
+                              ),
+                            );
+                          } else {
+                            return Center(
+                              child: Container(
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Theme.of(context).dividerColor, width: 2),             
+                                  borderRadius: BorderRadius.circular(30)
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 15),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      SizedBox(height: 0,),
+                                      Icon(Icons.celebration_outlined, color: Theme.of(context).dividerColor.withAlpha(100), size: 50,),
+                                      Text('Keine Hausaufgaben bis morgen', style: TextStyle(color: Theme.of(context).dividerColor.withAlpha(150), fontSize: 15),)
+                                    ],
+                                  ),
+                                ),
+                              )
+                            );
+                          }
+                        } else {
+                          return Text('Lädt...');
+                        }
+                      }
+                    )
+                  ],
+                ),
+              ),     
             ]
           ),
         ),

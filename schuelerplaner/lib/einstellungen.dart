@@ -5,6 +5,7 @@ import 'package:schuelerplaner/db/datenbank.dart';
 import 'package:schuelerplaner/main.dart';
 import 'package:schuelerplaner/farbManipulation.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EinstellungenSeite extends StatefulWidget {
   const EinstellungenSeite({super.key});
@@ -13,8 +14,43 @@ class EinstellungenSeite extends StatefulWidget {
   State<EinstellungenSeite> createState() => _EinstellungenSeiteState();
 }
 
+void speicherStandardLaenge(laenge) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setInt('stundenLaenge', laenge);
+}
+
+void speicherName(name) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString('benutzername', name);
+}
+
 class _EinstellungenSeiteState extends State<EinstellungenSeite> {
-  List<bool> farbThemenAuswahl = <bool>[true, false, false, false];
+  List<bool> farbThemenAuswahl = <bool>[true, false];
+  TextEditingController stundenLaengeController = TextEditingController();
+  TextEditingController benutzernameController = TextEditingController();
+  int stundenLaenge = 45;
+  String benutzername = 'Benutzer';
+
+  @override
+  void initState() {
+    
+    textfelderVorausfuellen();
+    super.initState();
+  }
+
+  Future<void> datenbankLeeren() async {
+    Datenbank datenbank = await Datenbank.instance;
+    datenbank.loeschen();
+  }
+
+  void textfelderVorausfuellen() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    stundenLaenge = prefs.getInt('stundenLaenge') ?? 45;
+    stundenLaengeController.text = stundenLaenge.toString();
+
+    benutzername = prefs.getString('benutzername') ?? 'Benutzer';
+    benutzernameController.text = benutzername;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,43 +65,57 @@ class _EinstellungenSeiteState extends State<EinstellungenSeite> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('OLED Dark Mode', style: TextStyle(fontSize: 17),),
-              SizedBox(height: 10,),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  return ToggleButtons(
-                    borderRadius: BorderRadius.circular(30),
-                    constraints:
-                      BoxConstraints.expand(width: constraints.maxWidth / 4.06),
-                    children: [
-                      Text('Hell'),
-                      Text('Dunkel'),
-                      Text('System'),
-                      Text('OLED'),
-                    ], 
-                    isSelected: farbThemenAuswahl,
-                    onPressed: (int index) {
-                      setState(() {
-                        for (var i = 0; i < farbThemenAuswahl.length; i++) {
-                          farbThemenAuswahl[i] = i == index;
-                        }
-                      });
-                  });
-                },         
-              ),
-              SizedBox(height: 40,),
+              //Text('OLED Dark Mode', style: TextStyle(fontSize: 17),),
+              //SizedBox(height: 10,),
+              //LayoutBuilder(
+              //  builder: (context, constraints) {
+              //    return ToggleButtons(
+              //      borderRadius: BorderRadius.circular(30),
+              //      constraints:
+              //        BoxConstraints.expand(width: constraints.maxWidth / 2.04),
+              //      children: [
+              //        Text('Aus'),
+              //        Text('An'),
+              //      ], 
+              //      isSelected: farbThemenAuswahl,
+              //      onPressed: (int index) {
+              //        setState(() {
+              //          for (var i = 0; i < farbThemenAuswahl.length; i++) {
+              //            farbThemenAuswahl[i] = i == index;
+              //          }                 
+              //        });
+              //    });
+              //  },         
+              //),
+              //SizedBox(height: 40,),
               Text('Standard Stundenlänge (in Minuten)', style: TextStyle(fontSize: 17),),
               SizedBox(height: 10,),
               TextField(
+                controller: stundenLaengeController,
+                onChanged: (value) {           
+                  speicherStandardLaenge(int.parse(value));
+                },
                 decoration: InputDecoration(
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
                 ),
                 keyboardType: TextInputType.number,
               ),
+              SizedBox(height: 30,),
+              Text('Dein Name:', style: TextStyle(fontSize: 17),),
+              SizedBox(height: 10,),
+              TextField(
+                controller: benutzernameController,
+                onChanged: (value) {
+                  speicherName(value);
+                },
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
+                ),
+              ),
               SizedBox(height: 40,),
               Container(width: double.infinity, height: 65, child: ElevatedButton(
-                  onPressed: () {null; 
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 2,)));
+                  onPressed: () {
+                    datenbankLeeren();
                   }, 
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,

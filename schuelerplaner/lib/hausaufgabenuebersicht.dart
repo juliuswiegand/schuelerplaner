@@ -239,6 +239,19 @@ class _HausaufgabeArchivKarteState extends State<HausaufgabeArchivKarte> {
     await Datenbank.instance.hausaufgabeLoeschen(widget.hausaufgabe.id);
   }
 
+  Future<void> hausaufgabeAlsUnerledigtMarkieren() async {
+    Hausaufgabe hausaufgabe = Hausaufgabe(
+      id: widget.hausaufgabe.id,
+      fachid: widget.hausaufgabe.fachid, 
+      erledigt: false, 
+      erstellungsZeitpunkt: widget.hausaufgabe.erstellungsZeitpunkt, 
+      abgabeZeitpunkt: widget.hausaufgabe.abgabeZeitpunkt, 
+      aufgabe: widget.hausaufgabe.aufgabe,
+    );
+
+    await Datenbank.instance.hausaufgabeAktualisieren(hausaufgabe);
+  }
+
   Future<void> ueberpeufeAlter() async {
     if (berechneUebrigeZeit() == 0) {
       await Datenbank.instance.hausaufgabeLoeschen(widget.hausaufgabe.id);
@@ -339,25 +352,49 @@ class _HausaufgabeArchivKarteState extends State<HausaufgabeArchivKarte> {
               ] 
             ),
             SizedBox(height: 20,),
-            Container(width: double.infinity, height: 40, 
-              child: ElevatedButton(
-                style: ButtonStyle(
-                  elevation: MaterialStateProperty.all(5),
+            Row(
+              children: [
+                Container(height: 40, 
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      elevation: MaterialStateProperty.all(5),
+                    ),
+                    onPressed: () {
+                      hausaufgabeLoeschen();
+                      widget.seiteAktualisieren();
+                    }, 
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.delete),
+                      ],
+                    ),
+                  )
                 ),
-                onPressed: () {
-                  hausaufgabeLoeschen();
-                  widget.seiteAktualisieren();
-                }, 
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.delete),
-                    SizedBox(width: 5,),
-                    Text('Löschen')
-                  ],
+                SizedBox(width: 10,),
+                Expanded(
+                  child: Container(height: 40, 
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        elevation: MaterialStateProperty.all(5),
+                      ),
+                      onPressed: () {
+                        hausaufgabeAlsUnerledigtMarkieren();
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 3,)));
+                      }, 
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.unarchive),
+                          SizedBox(width: 5,),
+                          Text('Als unerledigt markieren')
+                        ],
+                      ),
+                    )
+                  ),
                 ),
-              )
-            ),
+              ],
+            )
           ],
         ),
       ),

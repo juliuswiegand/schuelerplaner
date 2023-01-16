@@ -387,6 +387,7 @@ class Datenbank {
       hausaufgabenTabelle, 
       where: '${HausaufgabeFelder.erledigt} = ?',
       whereArgs: [1],
+      orderBy: sortierenNach,
     );
     return ergebniss.map((json) => Hausaufgabe.vonJson(json)).toList();
   }
@@ -531,6 +532,7 @@ class Datenbank {
     
     final db = await instance.datenbank;
     db.delete(fachTabelle);
+    db.delete(hausaufgabenTabelle);
     db.delete(montagTabelle);
     db.delete(dienstagTabelle);
     db.delete(mittwochTabelle);
