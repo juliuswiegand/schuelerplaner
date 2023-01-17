@@ -43,6 +43,11 @@ class _EinstellungenSeiteState extends State<EinstellungenSeite> {
     datenbank.loeschen();
   }
 
+  void debugErstesMal() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('erstesMal', true);
+  }
+
   void textfelderVorausfuellen() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     stundenLaenge = prefs.getInt('stundenLaenge') ?? 45;
@@ -123,6 +128,24 @@ class _EinstellungenSeiteState extends State<EinstellungenSeite> {
                       Icon(Icons.delete_forever, color: Colors.white,),
                       SizedBox(width: 5,),
                       Text('Appdaten löschen', style: TextStyle(color: Colors.white,),)
+                    ],
+                  ),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStatePropertyAll(Color.fromARGB(255, 180, 0, 0)),
+                    elevation: MaterialStateProperty.all(10),
+                  ),
+                )),
+
+                Container(width: double.infinity, height: 65, child: ElevatedButton(
+                  onPressed: () {
+                    debugErstesMal();
+                  }, 
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.delete_forever, color: Colors.white,),
+                      SizedBox(width: 5,),
+                      Text('debug erstes mal', style: TextStyle(color: Colors.white,),)
                     ],
                   ),
                   style: ButtonStyle(

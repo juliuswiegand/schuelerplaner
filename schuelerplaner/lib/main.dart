@@ -22,7 +22,7 @@ import 'package:introduction_screen/introduction_screen.dart';
 Database? datenbank;
 
 void main() {
-  runApp(WillkommenScreen());
+  runApp(MaterialApp(home: WillkommenScreen(), debugShowCheckedModeBanner: false,));
 }
 
 class WillkommenScreen extends StatefulWidget {
@@ -33,6 +33,26 @@ class WillkommenScreen extends StatefulWidget {
 }
 
 class _WillkommenScreenState extends State<WillkommenScreen> {
+  @override
+  void initState() {
+    weiterleitenFallNichtErstesMal(context);
+    super.initState();
+  }
+
+  void weiterleitenFallNichtErstesMal(buildContext) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool erstesMal = prefs.getBool('erstesMal') ?? true;
+    
+    if (!erstesMal) {
+      Navigator.push(buildContext, MaterialPageRoute(builder: (buildContext) => Homescreen()));
+    }
+  }
+
+  void fertig() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('erstesMal', false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -51,21 +71,82 @@ class _WillkommenScreenState extends State<WillkommenScreen> {
           child: IntroductionScreen(
             pages: [
               PageViewModel(
-                title: 'Willkommen',
-                image: Image(image: AssetImage('images/bildung.png')),
-                body: 'Mit dieser App kannst du deinen Stundenplan und deine Hausaufgaben managen'
+                title: 'Willkommen!',
+                body: 'Mit dieser App kannst du deinen Stundenplan und deine Hausaufgaben managen',
+
+                decoration: PageDecoration(
+                  bodyAlignment: Alignment.center,
+                  titleTextStyle: TextStyle(fontSize: 50)
+                )
               ),
               PageViewModel(
-                title: 'Hallo2',
-                body: 'text'
+                title: 'Erstelle deine Schulfächer um zu beginnen',
+                body: 'Gehe dazu auf den dritten Unterpunkt und tippe auf das Plus in der unteren rechten Ecke',
+
+                decoration: PageDecoration(
+                  bodyAlignment: Alignment.center,
+                  titleTextStyle: TextStyle(fontSize: 30)
+                )
+              ),
+              PageViewModel(
+                title: 'Dann kannst du die Fächer deinen Stundenplan zuweisen',
+                body: 'Gehe dazu auf den zweiten Unterpunkt und tippe auf das Plus in der unteren rechten Ecke',
+
+                decoration: PageDecoration(
+                  bodyAlignment: Alignment.center,
+                  titleTextStyle: TextStyle(fontSize: 30)
+                )
+              ),
+              PageViewModel(
+                title: 'Stunden hinzufügen',
+                body: 'Hier kannst du einer Stunde einen Raum und die Unterrichtszeiten zuweisen.',
+
+                decoration: PageDecoration(
+                  bodyAlignment: Alignment.center,
+                  titleTextStyle: TextStyle(fontSize: 30)
+                )
+              ),
+              PageViewModel(
+                title: 'Hausaufgaben erstellen',
+                body: 'Gehe auf den vierten Unterpunkt und tippe auf das Plus in der unteren rechten Ecke',
+
+                decoration: PageDecoration(
+                  bodyAlignment: Alignment.center,
+                  titleTextStyle: TextStyle(fontSize: 30)
+                )
+              ),
+              PageViewModel(
+                title: 'Hausaufgaben erstellen',
+                body: 'Füge deinen Hausaufgaben das zugehöhrige Fach und einen Abgabetermin zu. Diesen kannst du auch einfach zur nächsten Stunde setzen.',
+
+                decoration: PageDecoration(
+                  bodyAlignment: Alignment.center,
+                  titleTextStyle: TextStyle(fontSize: 30)
+                )
+              ),
+              PageViewModel(
+                title: 'Viel Erfolg!',
+                body: '',
+
+                decoration: PageDecoration(
+                  bodyAlignment: Alignment.center,
+                  titleTextStyle: TextStyle(fontSize: 50)
+                )
               ),
             ],
             next: Icon(Icons.arrow_forward),
             back: Icon(Icons.arrow_back),
             showBackButton: true,
+            dotsFlex: 3,
+            dotsDecorator: DotsDecorator(
+              activeColor: Color.fromARGB(255, 67, 139, 79),
+              activeSize: Size(30, 10),
+              activeShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            ),
             done: Text('Fertig'),
             onDone: () {
-              print('Fertig');
+              fertig();
+              Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen()));
             },
           ),
         ),
