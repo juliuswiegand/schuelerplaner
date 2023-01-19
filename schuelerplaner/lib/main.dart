@@ -21,8 +21,25 @@ import 'package:introduction_screen/introduction_screen.dart';
 
 Database? datenbank;
 
-void main() {
-  runApp(MaterialApp(home: WillkommenScreen(), debugShowCheckedModeBanner: false,));
+void main() async {
+  var app;
+
+  WidgetsFlutterBinding.ensureInitialized();
+  await weiterleitenFallNichtErstesMal().then((value) {
+    if (value) {
+      app = WillkommenScreen();
+    } else {
+      app = Homescreen();
+    }
+  },);
+
+  runApp(MaterialApp(home: app, debugShowCheckedModeBanner: false,));
+}
+
+Future<bool> weiterleitenFallNichtErstesMal() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool erstesMal = prefs.getBool('erstesMal') ?? true;
+  return erstesMal;
 }
 
 class WillkommenScreen extends StatefulWidget {
@@ -33,21 +50,6 @@ class WillkommenScreen extends StatefulWidget {
 }
 
 class _WillkommenScreenState extends State<WillkommenScreen> {
-  @override
-  void initState() {
-    weiterleitenFallNichtErstesMal(context);
-    super.initState();
-  }
-
-  void weiterleitenFallNichtErstesMal(buildContext) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool erstesMal = prefs.getBool('erstesMal') ?? true;
-    
-    if (!erstesMal) {
-      Navigator.push(buildContext, MaterialPageRoute(builder: (buildContext) => Homescreen()));
-    }
-  }
-
   void fertig() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('erstesMal', false);
@@ -56,6 +58,7 @@ class _WillkommenScreenState extends State<WillkommenScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
         fontFamily: 'Poppins',
@@ -76,14 +79,17 @@ class _WillkommenScreenState extends State<WillkommenScreen> {
 
                 decoration: PageDecoration(
                   bodyAlignment: Alignment.center,
-                  titleTextStyle: TextStyle(fontSize: 50)
+                  titleTextStyle: TextStyle(fontSize: 40)
                 )
               ),
               PageViewModel(
                 title: 'Erstelle deine Schulfächer um zu beginnen',
                 body: 'Gehe dazu auf den dritten Unterpunkt und tippe auf das Plus in der unteren rechten Ecke',
+                image: Image.asset('images/fachseite.png'),
+                
 
                 decoration: PageDecoration(
+                  
                   bodyAlignment: Alignment.center,
                   titleTextStyle: TextStyle(fontSize: 30)
                 )
@@ -130,7 +136,7 @@ class _WillkommenScreenState extends State<WillkommenScreen> {
 
                 decoration: PageDecoration(
                   bodyAlignment: Alignment.center,
-                  titleTextStyle: TextStyle(fontSize: 50)
+                  titleTextStyle: TextStyle(fontSize: 40)
                 )
               ),
             ],
