@@ -36,44 +36,55 @@ class _FachUebersichtState extends State<FachUebersicht> {
     setState(() => amLaden = false);
   }
 
+  Future<bool> zureuck() async {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 0,)));
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => NeuesFachSeite())).then((value) => faecherAktualisieren());
-        }, 
-        child: Icon(Icons.add),
-      ),
-      body: Container(
-        alignment: Alignment.topLeft,
-        child: SafeArea(
-            child: ( 
-              amLaden
-              ? CircularProgressIndicator()
-              : faecher.isEmpty
-                ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.sentiment_dissatisfied, size: 80, color: Theme.of(context).dividerColor.withAlpha(160),),
-                      SizedBox(height: 10,),
-                      Text('Noch keine Fächer erstellt', style: TextStyle(fontSize: 17, color: Theme.of(context).dividerColor.withAlpha(180),),)
-                    ],
-                  ),
-                )
-                : ListView.builder(
-                  padding: const EdgeInsets.all(25),
-                  itemCount: faecher.length,
-                  itemBuilder: (context, index) {
-                    final fach = faecher[index];
-                    return FachKarte(fach: fach, listeAktualisieren: faecherAktualisieren);
-                  },
-                )
-
-                
-            ),
-        )
+    return WillPopScope(
+      onWillPop: zureuck,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Fachübersicht'),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => NeuesFachSeite())).then((value) => faecherAktualisieren());
+          }, 
+          child: Icon(Icons.add),
+        ),
+        body: Container(
+          alignment: Alignment.topLeft,
+          child: SafeArea(
+              child: ( 
+                amLaden
+                ? CircularProgressIndicator()
+                : faecher.isEmpty
+                  ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.sentiment_dissatisfied, size: 80, color: Theme.of(context).dividerColor.withAlpha(160),),
+                        SizedBox(height: 10,),
+                        Text('Noch keine Fächer erstellt', style: TextStyle(fontSize: 17, color: Theme.of(context).dividerColor.withAlpha(180),),)
+                      ],
+                    ),
+                  )
+                  : ListView.builder(
+                    padding: const EdgeInsets.all(25),
+                    itemCount: faecher.length,
+                    itemBuilder: (context, index) {
+                      final fach = faecher[index];
+                      return FachKarte(fach: fach, listeAktualisieren: faecherAktualisieren);
+                    },
+                  )
+    
+                  
+              ),
+          )
+        ),
       ),
     );
   }
@@ -468,8 +479,8 @@ class _FachBearbeitenSeite extends State<FachBearbeitenSeite> {
                 SizedBox(height: 55,),
                 Spacer(flex: 1,),
                 Container(width: double.infinity, height: 65, child: ElevatedButton(
-                  onPressed: () {fachSpeichern(); 
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 2,)));
+                  onPressed: () {fachSpeichern();
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => FachUebersicht()));
                   }, 
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -531,7 +542,7 @@ class _FachDetailsState extends State<FachDetails> {
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.edit),
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => FachBearbeitenSeite(fach: widget.fach)));
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => FachBearbeitenSeite(fach: widget.fach)));
           },
         ),
         backgroundColor: Colors.transparent,

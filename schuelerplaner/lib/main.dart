@@ -55,6 +55,21 @@ class _WillkommenScreenState extends State<WillkommenScreen> {
     prefs.setBool('erstesMal', false);
   }
 
+  void speicherName(name) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('benutzername', name);
+  }
+
+  Future<void> blockenWennKeinBenutzername() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? benutzername = prefs.getString('benutzername');
+
+    if (benutzername != null) {
+      fertig();
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 1,)));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -131,8 +146,23 @@ class _WillkommenScreenState extends State<WillkommenScreen> {
                 )
               ),
               PageViewModel(
-                title: 'Viel Erfolg!',
-                body: '',
+                title: 'Zu aller letzt...',
+                bodyWidget: Column(
+                  children: [
+                    SizedBox(height: 30,),
+                    Text('Wie möchtest du genannt werden?', style: TextStyle(fontSize: 17),),
+                    SizedBox(height: 15,),
+                    TextField(
+                      onChanged: (value) {
+                        speicherName(value);
+                      },
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
+                        label: Text('Dein Name'),  
+                      ),
+                    )
+                  ],
+                ),
 
                 decoration: PageDecoration(
                   bodyAlignment: Alignment.center,
@@ -151,8 +181,7 @@ class _WillkommenScreenState extends State<WillkommenScreen> {
             ),
             done: Text('Fertig'),
             onDone: () {
-              fertig();
-              Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen()));
+              blockenWennKeinBenutzername();
             },
           ),
         ),
@@ -173,10 +202,11 @@ class Homescreen extends StatefulWidget {
 Color standardFarbe = Color.fromARGB(255, 67, 134, 73);
 
 class _HomescreenState extends State<Homescreen> {
-  int currentPageIndex = 0;
+  int currentPageIndex = 1;
 
   @override
   void initState() {
+    currentPageIndex = 1;
     if (widget.seiteWeiterleiten != null) {
       print('Direkt weiterleiten');
       currentPageIndex = widget.seiteWeiterleiten!;
@@ -208,7 +238,7 @@ class _HomescreenState extends State<Homescreen> {
           colorScheme: lightColorScheme,
           fontFamily: 'Poppins',
           textTheme: TextTheme(
-            labelMedium: TextStyle(color: Colors.white, fontSize: 18),
+            headline1: TextStyle(color: Colors.white, fontSize: 18),
           ),
           appBarTheme: AppBarTheme(
             systemOverlayStyle: SystemUiOverlayStyle.dark,
@@ -223,7 +253,7 @@ class _HomescreenState extends State<Homescreen> {
           //scaffoldBackgroundColor: Colors.black,
           fontFamily: 'Poppins',
           textTheme: TextTheme(
-            labelMedium: TextStyle(color: Colors.white, fontSize: 18),
+            headline1: TextStyle(color: Colors.white, fontSize: 18),
           ),
           appBarTheme: AppBarTheme(
             systemOverlayStyle: SystemUiOverlayStyle.light,
@@ -232,22 +262,22 @@ class _HomescreenState extends State<Homescreen> {
         ),
 
         home: Scaffold(
+          
           appBar: AppBar(
             toolbarHeight: 0,
           ),
-          body: [Dashboard(), StundenplanSeite(), FachUebersicht(), HausaufgabenSeite()][currentPageIndex],
-          bottomNavigationBar: NavigationBar(
+          body: [StundenplanSeite(), Dashboard(), HausaufgabenSeite()][currentPageIndex],
+          bottomNavigationBar: NavigationBar(    
             onDestinationSelected: (int index) {
               setState(() {
                 currentPageIndex = index;
               });
             },
             selectedIndex: currentPageIndex,
-            labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
             destinations: [
-              NavigationDestination(icon: Icon(Icons.home,), label: 'Dashboard'),
               NavigationDestination(icon: Icon(Icons.calendar_today), label: 'Stundenplan'),
-              NavigationDestination(icon: Icon(Icons.list), label: 'Fächer'),
+              NavigationDestination(icon: Icon(Icons.home,), label: 'Übersicht'),
               NavigationDestination(icon: Icon(Icons.task), label: 'Hausaufgaben')
             ],
           ),
@@ -395,15 +425,14 @@ class _DashboardState extends State<Dashboard> {
                 ],
               ),
 
-              GradientText(
+              Text(
                 benutzerName, 
                 style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold, height: 1),
-                colors: [standardFarbe, farbeVerdunkeln(standardFarbe, 0.1)],
               ),
 
-              SizedBox(height: 10,),
+              SizedBox(height: 15),
               Divider(thickness: 2,),
-              SizedBox(height: 30,),
+              SizedBox(height: 15),
               
               Expanded(
                 child: ListView(
@@ -433,10 +462,11 @@ class _DashboardState extends State<Dashboard> {
                                   } else {
                                     return Center(
                                       child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         crossAxisAlignment: CrossAxisAlignment.center,
-                                        children: [
-                                          SizedBox(height: 0,),
+                                        children: [      
                                           Icon(Icons.check, color: Theme.of(context).dividerColor.withAlpha(100), size: 50,),
+                                          SizedBox(height: 5,),
                                           Text('Heute hast du keine Stunden mehr', style: TextStyle(color: Theme.of(context).dividerColor.withAlpha(150), fontSize: 15),)
                                         ],
                                       ),
@@ -453,7 +483,7 @@ class _DashboardState extends State<Dashboard> {
                     ),
 
                     SizedBox(height: 35,),
-                    Text('Hausaufgaben für morgen:', style: TextStyle(fontSize: 19),),
+                    Text('Hausaufgaben bis morgen:', style: TextStyle(fontSize: 19),),
                     SizedBox(height: 12,),
 
                     FutureBuilder(
@@ -482,8 +512,8 @@ class _DashboardState extends State<Dashboard> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      SizedBox(height: 0,),
                                       Icon(Icons.celebration_outlined, color: Theme.of(context).dividerColor.withAlpha(100), size: 50,),
+                                      SizedBox(height: 5,),
                                       Text('Keine Hausaufgaben bis morgen', style: TextStyle(color: Theme.of(context).dividerColor.withAlpha(150), fontSize: 15),)
                                     ],
                                   ),

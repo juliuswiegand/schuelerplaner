@@ -380,7 +380,7 @@ class _HausaufgabeArchivKarteState extends State<HausaufgabeArchivKarte> {
                       ),
                       onPressed: () {
                         hausaufgabeAlsUnerledigtMarkieren();
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 3,)));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 2,)));
                       }, 
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -555,7 +555,7 @@ class _HausaufgabeKarteState extends State<HausaufgabeKarte> {
                 ),
                 onPressed: () {
                   alsErledigtMarkieren();
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 3,)));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 2,)));
                 }, 
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -627,7 +627,7 @@ class _HausaufgabeErstellenState extends State<HausaufgabeErstellen> {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 17, vertical: 11),
         child: DropdownButton(
-          style: Theme.of(context).textTheme.labelMedium,
+          style: Theme.of(context).textTheme.headline1,
           dropdownColor: farbeVerdunkeln(Color(int.parse(ausgewaehltesFach.farbe)), 0.18),
           isExpanded: true,
           underline: Container(),
@@ -811,7 +811,7 @@ class _HausaufgabeErstellenState extends State<HausaufgabeErstellen> {
 
                   Container(width: double.infinity, height: 65, child: ElevatedButton(
                     onPressed: () {hausaufgabeSpeichern(); 
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 3,)));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 2,)));
                     }, 
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -892,7 +892,7 @@ class _HausaufgabeBearbeitenState extends State<HausaufgabeBearbeiten> {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 17, vertical: 11),
         child: DropdownButton(
-          style: Theme.of(context).textTheme.labelMedium,
+          style: Theme.of(context).textTheme.headline1,
           dropdownColor: farbeVerdunkeln(Color(int.parse(ausgewaehltesFach.farbe)), 0.18),
           isExpanded: true,
           underline: Container(),
@@ -1084,7 +1084,7 @@ class _HausaufgabeBearbeitenState extends State<HausaufgabeBearbeiten> {
                     children: [
                       Container(height: 65, child: ElevatedButton(
                         onPressed: () {hausaufgabeLoeschen(); 
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 3,)));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 2,)));
                         }, 
                         child: Icon(Icons.delete),
                         style: ButtonStyle(
@@ -1097,7 +1097,7 @@ class _HausaufgabeBearbeitenState extends State<HausaufgabeBearbeiten> {
                       Expanded(
                         child: Container(height: 65, child: ElevatedButton(
                           onPressed: () {hausaufgabeSpeichern(); 
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 3,)));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 2,)));
                           }, 
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
