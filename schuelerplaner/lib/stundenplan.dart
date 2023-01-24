@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:schuelerplaner/fachuebersicht.dart';
 import 'package:schuelerplaner/modelle/datenbankmodell.dart';
 import 'package:schuelerplaner/db/datenbank.dart';
 import 'package:schuelerplaner/main.dart';
@@ -113,33 +112,20 @@ class _StundenplanSeiteState extends State<StundenplanSeite> {
   @override
   Widget build(BuildContext context) {
       return Scaffold(
-        floatingActionButton: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            FloatingActionButton(
-              onPressed:() {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => FachUebersicht()));
-              },
-              child: Icon(Icons.list),
-              heroTag: null,
-            ),
-            SizedBox(width: 10,),
-            FloatingActionButton(
-              onPressed: () {
-                if (bekommAnzahlFaecher() != 0) {
-                    Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => NeueStundeHinzufuegen(ausgewaehlterTag: ausgewaehlterTagIndex,))
-                  ).then((wert) => {tagAktualisert(ausgewaehlterTagIndex)});
-                } else {
-                  print('Es gibt noch keine Faeher');
-                  zeigeFachFehlermeldung();
-                }
-              }, 
-              child: Icon(Icons.add),
-              heroTag: 'NeueStundeSeite',
-            ),        
-          ],
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            if (bekommAnzahlFaecher() != 0) {
+                Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NeueStundeHinzufuegen(ausgewaehlterTag: ausgewaehlterTagIndex,))
+              ).then((wert) => {tagAktualisert(ausgewaehlterTagIndex)});
+            } else {
+              print('Es gibt noch keine Faeher');
+              zeigeFachFehlermeldung();
+            }
+          }, 
+          child: Icon(Icons.add),
+          heroTag: 'NeueStundeSeite',
         ),
         body: SafeArea(
           child: Padding(
@@ -209,7 +195,7 @@ class StundenDetails extends StatelessWidget {
   Future loeschen(BuildContext context) async {
     print('Lösche Eintrag');
     await Datenbank.instance.stundeLoeschen(schulstunde.id, wochentag);
-    Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 0,)));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 1,)));
   }
 
   @override
@@ -490,7 +476,7 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 17, vertical: 11),
         child: DropdownButton(
-          style: Theme.of(context).textTheme.headline1,
+          style: Theme.of(context).textTheme.labelMedium,
           dropdownColor: farbeVerdunkeln(Color(int.parse(ausgewaehltesFach.farbe)), 0.18),
           isExpanded: true,
           underline: Container(),
@@ -812,7 +798,7 @@ class _StundeBearbeitenSeite extends State<StundeBearbeitenSeite> {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 17, vertical: 11),
         child: DropdownButton(
-          style: Theme.of(context).textTheme.headline1,
+          style: Theme.of(context).textTheme.labelMedium,
           dropdownColor: farbeVerdunkeln(Color(int.parse(ausgewaehltesFach.farbe)), 0.18),
           isExpanded: true,
           underline: Container(),
@@ -911,7 +897,7 @@ class _StundeBearbeitenSeite extends State<StundeBearbeitenSeite> {
                 Container(width: double.infinity, height: 65, child: ElevatedButton(
                   onPressed: () {
                     schulstundeHinzufuegen();
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 0,)));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen(seiteWeiterleiten: 1,)));
                   }, 
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
