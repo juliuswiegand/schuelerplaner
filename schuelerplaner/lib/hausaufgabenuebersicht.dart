@@ -261,13 +261,13 @@ class _HausaufgabeArchivKarteState extends State<HausaufgabeArchivKarte> {
   int berechneUebrigeZeit() {
     int maximalesAlter = 14; // Tage
   	DateTime loeschungsTag = widget.hausaufgabe.abgabeZeitpunkt.add(Duration(days: maximalesAlter));
-    Duration differenz = DateTime.now().difference(loeschungsTag);
+    Duration differenz = loeschungsTag.difference(DateTime.now());
 
-    if (differenz.inDays.abs() <= 0) {
+    if (differenz.inDays <= 0) {
       return 0;
     }
 
-    return differenz.inDays.abs();
+    return differenz.inDays;
   }
 
   

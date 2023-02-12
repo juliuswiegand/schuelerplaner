@@ -14,7 +14,6 @@ import 'package:schuelerplaner/stundenplan.dart';
 import 'package:schuelerplaner/fachuebersicht.dart';
 import 'package:timer_builder/timer_builder.dart';
 import 'package:schuelerplaner/hausaufgabenuebersicht.dart';
-import 'package:schuelerplaner/hausaufgabenuebersicht.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:introduction_screen/introduction_screen.dart';
@@ -27,7 +26,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await weiterleitenFallNichtErstesMal().then((value) {
     if (value) {
-      app = WillkommenScreen();
+      app = ErsterWillkommenScreen();
     } else {
       app = Homescreen();
     }
@@ -47,6 +46,93 @@ class WillkommenScreen extends StatefulWidget {
 
   @override
   State<WillkommenScreen> createState() => _WillkommenScreenState();
+}
+
+class ErsterWillkommenScreen extends StatefulWidget {
+  const ErsterWillkommenScreen({super.key});
+
+  @override
+  State<ErsterWillkommenScreen> createState() => _ErsterWillkommenScreenState();
+}
+
+class _ErsterWillkommenScreenState extends State<ErsterWillkommenScreen> {
+  TextEditingController nameTextController = TextEditingController();
+
+  void fertig() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('erstesMal', false);
+    prefs.setString('benutzername', nameTextController.value.text);
+  }
+
+  SnackBar leererNameWarnung() {
+    return SnackBar(
+      content: Text('Bitte erste einen Namen eingeben', style: TextStyle(fontSize: 16),),
+      backgroundColor: Color.fromARGB(255, 77, 65, 182),
+    );
+  }
+
+  final _scaffholdManagerKey = GlobalKey<ScaffoldMessengerState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorSchemeSeed: Color.fromARGB(255, 25, 0, 255),
+        brightness: Brightness.light,
+        fontFamily: 'Poppins',
+      ),
+      darkTheme: ThemeData(
+        colorSchemeSeed: Color.fromARGB(255, 25, 0, 255),
+        brightness: Brightness.dark,
+        fontFamily: 'Poppins',
+      ),
+      themeMode: ThemeMode.system,
+
+      home: ScaffoldMessenger(
+        key: _scaffholdManagerKey,
+        child: Scaffold(
+          body: SafeArea(
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 50),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Willkommen', style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),),
+                    SizedBox(height: 30,),
+                    Text('Wie willst du genannt werden?', style: TextStyle(fontSize: 18),),
+                    SizedBox(height: 10,),
+                    TextField(
+                      controller: nameTextController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                        labelText: 'Name'
+                      ),            
+                    ),
+                    SizedBox(height: 30,),
+                    FilledButton(
+                      onPressed: () {
+                        if (nameTextController.value.text != '') {
+                          fertig();
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen()));
+                        } else {
+                          ScaffoldMessengerState messenger = _scaffholdManagerKey.currentState!;
+                          messenger.showSnackBar(leererNameWarnung());
+                        }               
+                      },
+                      child: Text('Fertig', style: TextStyle(fontWeight: FontWeight.bold),),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _WillkommenScreenState extends State<WillkommenScreen> {
@@ -74,65 +160,16 @@ class _WillkommenScreenState extends State<WillkommenScreen> {
           child: IntroductionScreen(
             pages: [
               PageViewModel(
-                title: 'Willkommen!',
-                body: 'Mit dieser App kannst du deinen Stundenplan und deine Hausaufgaben managen',
-
-                decoration: PageDecoration(
-                  bodyAlignment: Alignment.center,
-                  titleTextStyle: TextStyle(fontSize: 40)
-                )
-              ),
-              PageViewModel(
-                title: 'Erstelle deine Schulfächer um zu beginnen',
-                body: 'Gehe dazu auf den dritten Unterpunkt und tippe auf das Plus in der unteren rechten Ecke',
-                image: Image.asset('images/fachseite.png'),
-                
-
-                decoration: PageDecoration(
-                  
-                  bodyAlignment: Alignment.center,
-                  titleTextStyle: TextStyle(fontSize: 30)
-                )
-              ),
-              PageViewModel(
-                title: 'Dann kannst du die Fächer deinen Stundenplan zuweisen',
-                body: 'Gehe dazu auf den zweiten Unterpunkt und tippe auf das Plus in der unteren rechten Ecke',
-
-                decoration: PageDecoration(
-                  bodyAlignment: Alignment.center,
-                  titleTextStyle: TextStyle(fontSize: 30)
-                )
-              ),
-              PageViewModel(
-                title: 'Stunden hinzufügen',
-                body: 'Hier kannst du einer Stunde einen Raum und die Unterrichtszeiten zuweisen.',
-
-                decoration: PageDecoration(
-                  bodyAlignment: Alignment.center,
-                  titleTextStyle: TextStyle(fontSize: 30)
-                )
-              ),
-              PageViewModel(
-                title: 'Hausaufgaben erstellen',
-                body: 'Gehe auf den vierten Unterpunkt und tippe auf das Plus in der unteren rechten Ecke',
-
-                decoration: PageDecoration(
-                  bodyAlignment: Alignment.center,
-                  titleTextStyle: TextStyle(fontSize: 30)
-                )
-              ),
-              PageViewModel(
-                title: 'Hausaufgaben erstellen',
-                body: 'Füge deinen Hausaufgaben das zugehöhrige Fach und einen Abgabetermin zu. Diesen kannst du auch einfach zur nächsten Stunde setzen.',
-
-                decoration: PageDecoration(
-                  bodyAlignment: Alignment.center,
-                  titleTextStyle: TextStyle(fontSize: 30)
-                )
-              ),
-              PageViewModel(
                 title: 'Viel Erfolg!',
-                body: '',
+                bodyWidget: Column(
+                  children: [
+                    TextField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(20))
+                      ),
+                    ),
+                  ],
+                ),
 
                 decoration: PageDecoration(
                   bodyAlignment: Alignment.center,
@@ -170,7 +207,7 @@ class Homescreen extends StatefulWidget {
   State<Homescreen> createState() => _HomescreenState();
 }
 
-Color standardFarbe = Color.fromARGB(255, 67, 134, 73);
+Color standardFarbe = Color.fromARGB(255, 92, 89, 228);
 
 class _HomescreenState extends State<Homescreen> {
   int currentPageIndex = 0;
@@ -398,7 +435,7 @@ class _DashboardState extends State<Dashboard> {
               GradientText(
                 benutzerName, 
                 style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold, height: 1),
-                colors: [standardFarbe, farbeVerdunkeln(standardFarbe, 0.1)],
+                colors: [standardFarbe, farbeVerdunkeln(standardFarbe, 0.07)],
               ),
 
               SizedBox(height: 10,),
@@ -461,13 +498,8 @@ class _DashboardState extends State<Dashboard> {
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           if (snapshot.data!.length != 0) {
-                            return Expanded(
-                              child: ListView(
-                                //crossAxisAlignment: CrossAxisAlignment.start,
-                                shrinkWrap: true,
-                                physics: ClampingScrollPhysics(),
-                                children: snapshot.data!,
-                              ),
+                            return Column(
+                              children: snapshot.data!,
                             );
                           } else {
                             return Center(

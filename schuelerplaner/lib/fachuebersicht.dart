@@ -301,20 +301,22 @@ class FachKarte extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             //crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                    Text(
-                      fach.name,
-                      style: TextStyle(fontSize: 25, color: Colors.white, fontWeight: FontWeight.bold),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      fach.lehrer,
-                      style: TextStyle(fontSize: 15, color: Colors.white),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                ],
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                      Text(
+                        fach.name,
+                        style: TextStyle(fontSize: 25, color: Colors.white, fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        fach.lehrer,
+                        style: TextStyle(fontSize: 15, color: Colors.white),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
+                ),
               ),
               
               IconButton(onPressed: delete, icon: Icon(Icons.delete, size: 30,), color: Color.fromARGB(255, 255, 255, 255),)

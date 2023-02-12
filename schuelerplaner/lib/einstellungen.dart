@@ -136,23 +136,23 @@ class _EinstellungenSeiteState extends State<EinstellungenSeite> {
                   ),
                 )),
 
-                Container(width: double.infinity, height: 65, child: ElevatedButton(
-                  onPressed: () {
-                    debugErstesMal();
-                  }, 
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.delete_forever, color: Colors.white,),
-                      SizedBox(width: 5,),
-                      Text('debug erstes mal', style: TextStyle(color: Colors.white,),)
-                    ],
-                  ),
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStatePropertyAll(Color.fromARGB(255, 180, 0, 0)),
-                    elevation: MaterialStateProperty.all(10),
-                  ),
-                )),
+                //Container(width: double.infinity, height: 65, child: ElevatedButton(
+                //  onPressed: () {
+                //    debugErstesMal();
+                //  }, 
+                //  child: Row(
+                //    mainAxisAlignment: MainAxisAlignment.center,
+                //    children: [
+                //      Icon(Icons.delete_forever, color: Colors.white,),
+                //      SizedBox(width: 5,),
+                //      Text('debug erstes mal', style: TextStyle(color: Colors.white,),)
+                //    ],
+                //  ),
+                //  style: ButtonStyle(
+                //    backgroundColor: MaterialStatePropertyAll(Color.fromARGB(255, 180, 0, 0)),
+                //    elevation: MaterialStateProperty.all(10),
+                //  ),
+                //)),
             ]
               ),
           ),
