@@ -1,0 +1,20 @@
+Datenschutzerklärung für Schülerplaner:
+
+Diese Datenschutzerklärung beschreibt, wie die App Schülerplaner die Daten der Benutzer behandelt, die die App nutzen.
+
+Welche Daten gesammelt werden:
+Es werden keine personenbezogenen Daten von Ihnen gesammelt. Personenbezogene Daten sind alle Informationen, die Sie identifizieren oder identifizierbar machen können, wie z.B. Ihr Name, Ihre E-Mail-Adresse, Ihre Telefonnummer oder Ihre IP-Adresse.
+Die einzigen Daten, die gespeichert werden, sind die Daten, die Sie freiwillig in der App eingeben, wie z.B. Ihr Name, Ihr Stundenplan und Ihre Hausaufgaben. Diese Daten werden ausschließlich lokal auf Ihrem Gerät gespeichert und nicht an uns oder Dritte übermittelt oder geteilt.
+
+Wie wir die gesammelten Daten verwenden:
+Die von Ihnen eingegebenen Daten werden nur genutzt, um Ihnen die Funktionen und Dienste der App zur Verfügung zu stellen, wie z.B. die Anzeige Ihres Stundenplans und Ihrer Hausaufgaben. Wir verwenden die Daten nicht für andere Zwecke, wie z.B. Marketing, Analyse oder Profiling.
+
+Wie wir die gesammelten Daten schützen:
+Die Daten werden nur lokal auf Ihrem Gerät gespeichert und nicht auf Servern gespeichert. Die Daten werden bei der Deinstallation gelöscht.
+
+
+Wie Sie Ihre Zustimmung widerrufen können
+Sie können Ihre Zustimmung zu dieser Datenschutzerklärung jederzeit widerrufen, indem Sie die App deinstallieren oder die Daten in der App löschen.
+
+Wie Sie uns kontaktieren können
+Wenn Sie Fragen oder Anliegen zu dieser Datenschutzerklärung haben melden sie sich bei: julius.wiegand05@gmail.com
