@@ -33,7 +33,6 @@ class _EinstellungenSeiteState extends State<EinstellungenSeite> {
 
   @override
   void initState() {
-    
     textfelderVorausfuellen();
     super.initState();
   }
@@ -70,29 +69,6 @@ class _EinstellungenSeiteState extends State<EinstellungenSeite> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //Text('OLED Dark Mode', style: TextStyle(fontSize: 17),),
-              //SizedBox(height: 10,),
-              //LayoutBuilder(
-              //  builder: (context, constraints) {
-              //    return ToggleButtons(
-              //      borderRadius: BorderRadius.circular(30),
-              //      constraints:
-              //        BoxConstraints.expand(width: constraints.maxWidth / 2.04),
-              //      children: [
-              //        Text('Aus'),
-              //        Text('An'),
-              //      ], 
-              //      isSelected: farbThemenAuswahl,
-              //      onPressed: (int index) {
-              //        setState(() {
-              //          for (var i = 0; i < farbThemenAuswahl.length; i++) {
-              //            farbThemenAuswahl[i] = i == index;
-              //          }                 
-              //        });
-              //    });
-              //  },         
-              //),
-              //SizedBox(height: 40,),
               Text('Standard Stundenlänge (in Minuten)', style: TextStyle(fontSize: 17),),
               SizedBox(height: 10,),
               TextField(

@@ -179,7 +179,6 @@ class _StundenplanSeiteState extends State<StundenplanSeite> {
       );
   }
 }
-
 class StundenDetails extends StatelessWidget {
   const StundenDetails({
     super.key,
@@ -210,14 +209,12 @@ class StundenDetails extends StatelessWidget {
 
       Duration aktuelleDifferenz = startzeit.difference(aktuelleZeit);
       int aktuelleDifferenzInMinuten = aktuelleDifferenz.inMinutes;
-      //print(aktuelleDifferenzInMinuten);
 
       if (differenzInMinuten == 0) {
         return 1;
       }
 
       double prozentualerFortschritt = aktuelleDifferenzInMinuten / differenzInMinuten;
-
 
       if (prozentualerFortschritt > 1) {
         return 1;
@@ -476,7 +473,7 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 17, vertical: 11),
         child: DropdownButton(
-          style: Theme.of(context).textTheme.labelMedium,
+          style: Theme.of(context).textTheme.labelSmall,
           dropdownColor: farbeVerdunkeln(Color(int.parse(ausgewaehltesFach.farbe)), 0.18),
           isExpanded: true,
           underline: Container(),
@@ -798,7 +795,7 @@ class _StundeBearbeitenSeite extends State<StundeBearbeitenSeite> {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 17, vertical: 11),
         child: DropdownButton(
-          style: Theme.of(context).textTheme.labelMedium,
+          style: Theme.of(context).textTheme.labelSmall,
           dropdownColor: farbeVerdunkeln(Color(int.parse(ausgewaehltesFach.farbe)), 0.18),
           isExpanded: true,
           underline: Container(),

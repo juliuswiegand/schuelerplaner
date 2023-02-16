@@ -627,7 +627,7 @@ class _HausaufgabeErstellenState extends State<HausaufgabeErstellen> {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 17, vertical: 11),
         child: DropdownButton(
-          style: Theme.of(context).textTheme.labelMedium,
+          style: Theme.of(context).textTheme.labelSmall,
           dropdownColor: farbeVerdunkeln(Color(int.parse(ausgewaehltesFach.farbe)), 0.18),
           isExpanded: true,
           underline: Container(),
@@ -892,7 +892,7 @@ class _HausaufgabeBearbeitenState extends State<HausaufgabeBearbeiten> {
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 17, vertical: 11),
         child: DropdownButton(
-          style: Theme.of(context).textTheme.labelMedium,
+          style: Theme.of(context).textTheme.labelSmall,
           dropdownColor: farbeVerdunkeln(Color(int.parse(ausgewaehltesFach.farbe)), 0.18),
           isExpanded: true,
           underline: Container(),

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:schuelerplaner/db/datenbank.dart';
@@ -8,7 +7,6 @@ import 'package:schuelerplaner/farbManipulation.dart';
 import 'package:schuelerplaner/modelle/datenbankmodell.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:simple_gradient_text/simple_gradient_text.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:schuelerplaner/stundenplan.dart';
 import 'package:schuelerplaner/fachuebersicht.dart';
@@ -71,7 +69,7 @@ class _ErsterWillkommenScreenState extends State<ErsterWillkommenScreen> {
     );
   }
 
-  final _scaffholdManagerKey = GlobalKey<ScaffoldMessengerState>();
+  final _scaffoldManagerSchluessel = GlobalKey<ScaffoldMessengerState>();
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +88,7 @@ class _ErsterWillkommenScreenState extends State<ErsterWillkommenScreen> {
       themeMode: ThemeMode.system,
 
       home: ScaffoldMessenger(
-        key: _scaffholdManagerKey,
+        key: _scaffoldManagerSchluessel,
         child: Scaffold(
           body: SafeArea(
             child: Center(
@@ -118,7 +116,7 @@ class _ErsterWillkommenScreenState extends State<ErsterWillkommenScreen> {
                           fertig();
                           Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen()));
                         } else {
-                          ScaffoldMessengerState messenger = _scaffholdManagerKey.currentState!;
+                          ScaffoldMessengerState messenger = _scaffoldManagerSchluessel.currentState!;
                           messenger.showSnackBar(leererNameWarnung());
                         }               
                       },
@@ -236,7 +234,6 @@ class _HomescreenState extends State<Homescreen> {
           darkColorScheme = ColorScheme.fromSeed(seedColor: standardFarbe, brightness: Brightness.dark);
         }
       
-
       return MaterialApp(
         debugShowCheckedModeBanner: false,
 
@@ -245,7 +242,7 @@ class _HomescreenState extends State<Homescreen> {
           colorScheme: lightColorScheme,
           fontFamily: 'Poppins',
           textTheme: TextTheme(
-            labelMedium: TextStyle(color: Colors.white, fontSize: 18),
+            labelSmall:  TextStyle(color: Colors.white, fontSize: 18),
           ),
           appBarTheme: AppBarTheme(
             systemOverlayStyle: SystemUiOverlayStyle.dark,
@@ -260,7 +257,7 @@ class _HomescreenState extends State<Homescreen> {
           //scaffoldBackgroundColor: Colors.black,
           fontFamily: 'Poppins',
           textTheme: TextTheme(
-            labelMedium: TextStyle(color: Colors.white, fontSize: 18),
+            labelSmall:  TextStyle(color: Colors.white, fontSize: 18),
           ),
           appBarTheme: AppBarTheme(
             systemOverlayStyle: SystemUiOverlayStyle.light,
@@ -280,7 +277,7 @@ class _HomescreenState extends State<Homescreen> {
               });
             },
             selectedIndex: currentPageIndex,
-            labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
             destinations: [
               NavigationDestination(icon: Icon(Icons.home,), label: 'Dashboard'),
               NavigationDestination(icon: Icon(Icons.calendar_today), label: 'Stundenplan'),
@@ -358,9 +355,6 @@ class _DashboardState extends State<Dashboard> {
     if (naechstenStunden.length == 0) {
       return [];
     }
-
-    //naechstenStundenKarten.add(Text('Deine nächsten Stunden:', style: TextStyle(fontSize: 19),),);
-    //naechstenStundenKarten.add(SizedBox(height: 12,),);
 
     // zeige nur die naechsten 3 stunden
     for (var i = 0; i < naechstenStunden.length; i++) {
@@ -563,7 +557,6 @@ class naechsteStundeKarte extends StatelessWidget {
 
     Duration aktuelleDifferenz = startzeit.difference(aktuelleZeit);
     int aktuelleDifferenzInMinuten = aktuelleDifferenz.inMinutes;
-    //print(aktuelleDifferenzInMinuten);
 
     if (differenzInMinuten == 0) {
       return 1;

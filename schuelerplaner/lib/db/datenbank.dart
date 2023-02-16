@@ -131,6 +131,7 @@ class Datenbank {
 
   Future<Schulstunde> stundeHinzufuegen(int tagIndex, Schulstunde stunde) async {
     final db = await instance.datenbank;
+    final List<String> tagTabellen = ['montagTabelle', 'dienstagTabelle', 'mittwochTabelle', 'donnerstagTabelle', 'freitagTabelle', 'samstagTabelle', 'sonntagTabelle'];
 
     if (tagIndex == 0) {
       final id = await db.insert(montagTabelle, stunde.zuJson());
