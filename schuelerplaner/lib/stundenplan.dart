@@ -525,7 +525,9 @@ class _NeueStundeHinzufuegenState extends State<NeueStundeHinzufuegen> {
                     labelText: 'Raum',
                   ),
                 ),
-                SizedBox(height: 30,),
+                SizedBox(height: 40,),
+                Text('Uhrzeit: ', style: TextStyle(fontSize: 16),),
+                SizedBox(height: 5,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -855,7 +857,9 @@ class _StundeBearbeitenSeite extends State<StundeBearbeitenSeite> {
                     labelText: 'Raum',
                   ),
                 ),
-                SizedBox(height: 30,),
+                SizedBox(height: 40,),
+                Text('Uhrzeit: ', style: TextStyle(fontSize: 16),),
+                SizedBox(height: 5,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

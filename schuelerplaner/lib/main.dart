@@ -187,7 +187,7 @@ class _WillkommenScreenState extends State<WillkommenScreen> {
             done: Text('Fertig'),
             onDone: () {
               fertig();
-              Navigator.push(context, MaterialPageRoute(builder: (context) => Homescreen()));
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Homescreen()));
             },
           ),
         ),
