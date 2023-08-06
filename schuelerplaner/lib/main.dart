@@ -426,10 +426,9 @@ class _DashboardState extends State<Dashboard> {
                 ],
               ),
 
-              GradientText(
+              Text(
                 benutzerName, 
-                style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold, height: 1),
-                colors: [standardFarbe, farbeVerdunkeln(standardFarbe, 0.07)],
+                style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold, height: 1, color: standardFarbe),        
               ),
 
               SizedBox(height: 10,),

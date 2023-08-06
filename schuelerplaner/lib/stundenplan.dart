@@ -141,9 +141,14 @@ class _StundenplanSeiteState extends State<StundenplanSeite> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.error_outline, size: 80, color: Theme.of(context).dividerColor.withAlpha(130),),
+                            Icon(Icons.error_outline, size: 80, color: Theme.of(context).dividerColor.withAlpha(190),),
                             SizedBox(height: 10,),
-                            Text('Noch keine Stunden hinzugefügt', style: TextStyle(fontSize: 17, color: Theme.of(context).dividerColor.withAlpha(160),),)
+                            Text('Noch keine Stunden hinzugefügt', style: TextStyle(fontSize: 17, color: Theme.of(context).dividerColor.withAlpha(190),)),
+                            SizedBox(height: 15,),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              child: Text('Drücke auf den Knopf mit dem “+” Symbol unten rechts, um deine Fächer in den Stundenplan hinzuzufügen', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: Theme.of(context).dividerColor.withAlpha(130)),),
+                            )
                           ],
                         ),
                       )

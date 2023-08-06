@@ -56,9 +56,15 @@ class _FachUebersichtState extends State<FachUebersicht> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.sentiment_dissatisfied, size: 80, color: Theme.of(context).dividerColor.withAlpha(160),),
+                      Icon(Icons.sentiment_dissatisfied, size: 80, color: Theme.of(context).dividerColor.withAlpha(195),),
                       SizedBox(height: 10,),
-                      Text('Noch keine Fächer erstellt', style: TextStyle(fontSize: 17, color: Theme.of(context).dividerColor.withAlpha(180),),)
+                      Text('Noch keine Fächer erstellt', style: TextStyle(fontSize: 17, color: Theme.of(context).dividerColor.withAlpha(195),),),
+                      SizedBox(height: 15,),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 40),
+                        child: Text('Drücke auf den Knopf mit dem “+” Symbol unten rechts, um Fächer zu erstellen', textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: Theme.of(context).dividerColor.withAlpha(130)),),
+                      )
+       
                     ],
                   ),
                 )
@@ -87,8 +93,8 @@ class NeuesFachSeite extends StatefulWidget {
 }
 
 class _NeuesFachSeiteState extends State<NeuesFachSeite> {
-  Color fachFarbe = Color(4286279837);
-  String fachFarbeString = '4286279837'; // mit int.parse(STRING) in farbe umwandelbar
+  Color fachFarbe = Color(4281965163);
+  String fachFarbeString = '4281965163'; // mit int.parse(STRING) in farbe umwandelbar
 
   TextEditingController fachNameController = TextEditingController();
   TextEditingController fachLehrerController = TextEditingController();

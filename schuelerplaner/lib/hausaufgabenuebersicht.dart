@@ -6,7 +6,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:schuelerplaner/db/datenbank.dart';
 import 'package:schuelerplaner/modelle/datenbankmodell.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:timer_builder/timer_builder.dart';
 import 'package:schuelerplaner/farbManipulation.dart';
 import 'package:schuelerplaner/main.dart';
@@ -106,7 +105,7 @@ class _HausaufgabenSeiteState extends State<HausaufgabenSeite> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.sentiment_very_satisfied, size: 80, color: Theme.of(context).dividerColor.withAlpha(130),),
+                  Icon(Icons.sentiment_very_satisfied, size: 80, color: Theme.of(context).dividerColor.withAlpha(195),),
                   SizedBox(height: 10,),
                   Text('Keine Hausaufgaben', style: TextStyle(color: Theme.of(context).dividerColor.withAlpha(160),),),
                 ],
